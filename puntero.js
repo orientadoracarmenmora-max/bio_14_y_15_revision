@@ -6,6 +6,9 @@
  const abrirAjustes = document.querySelector('#abrir-ajustes-puntero');
  const lienzo = document.querySelector('#capa-puntero');
  const ctx = lienzo.getContext('2d');
+ const esIPad = /iPad/i.test(navigator.userAgent)
+  || (/^Mac/i.test(navigator.platform) && navigator.maxTouchPoints > 1);
+ const dibujaCon = tipo => tipo==='pen' || (tipo==='mouse' && !esIPad);
  const clave = 'geologia-puntero-v3';
  const ajustes = {modo:'line', estilo:'fine', borrado:'thin', adorno:'none', tinta:'solid', color:'#FFACCA', ancho:23, opacidad:75, duracion:2.2};
  const tonos = [['Amarillo vainilla','#FFE582'],['Rosa pastel','#FFACCA'],['Melocotón pastel','#FFC395'],['Menta pastel','#A9EBC2'],['Azul cielo','#A6DDFC'],['Lila pastel','#D7B9FC']];
@@ -56,7 +59,7 @@
  <label>Duración del rastro <input name="duracion" type="range" min=".2" max="8" step=".1"><output data-valor="duracion"></output></label>
  <div class="muestra-puntero"><span>Texto de ejemplo del subrayador</span></div>
  <button type="button" id="borrar-rastro">Borrar trazos</button>
- <p>Dibuja con el Apple Pencil y usa el dedo para desplazarte o tocar los botones.</p>`;
+ <p>${esIPad ? 'Dibuja con el Apple Pencil y usa el dedo para desplazarte o tocar los botones.' : 'Haz clic y arrastra con el trackpad o el ratón para dibujar.'}</p>`;
 
  let activo = false;
  let cuadro = 0;
@@ -366,7 +369,7 @@
  }
  const controles='a,button,input,textarea,select,summary,label,[contenteditable]';
  document.addEventListener('pointerdown',e=>{
-  if(!activo || gesto || e.pointerType!=='pen' || e.button!==0 || barra.contains(e.target)) return;
+  if(!activo || gesto || !dibujaCon(e.pointerType) || e.button!==0 || barra.contains(e.target)) return;
   const control=e.target.closest(controles);
   if(control?.matches('textarea,select,[contenteditable],input:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit])')) return;
   clearTimeout(temporizadorClic);
@@ -398,7 +401,7 @@
   temporizadorClic=setTimeout(()=>{suprimirClic=false;},0);
  });
  document.addEventListener('click',e=>{
-  if(suprimirClic && e.detail>0 && (!e.pointerType || e.pointerType==='pen')){e.preventDefault();e.stopPropagation();}
+  if(suprimirClic && e.detail>0 && (!e.pointerType || dibujaCon(e.pointerType))){e.preventDefault();e.stopPropagation();}
  },true);
  document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
