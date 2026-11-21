@@ -6,9 +6,17 @@
  const abrirAjustes = document.querySelector('#abrir-ajustes-puntero');
  const lienzo = document.querySelector('#capa-puntero');
  const ctx = lienzo.getContext('2d');
- const clave = 'geologia-puntero-v2';
- const ajustes = {modo:'line', estilo:'fine', borrado:'thin', color:'#FFACCA', ancho:15, opacidad:22, duracion:2.2};
+ const clave = 'geologia-puntero-v3';
+ const ajustes = {modo:'line', estilo:'fine', borrado:'thin', adorno:'none', color:'#FFACCA', ancho:23, opacidad:75, duracion:2.2};
  const tonos = [['Amarillo vainilla','#FFE582'],['Rosa pastel','#FFACCA'],['Melocotón pastel','#FFC395'],['Menta pastel','#A9EBC2'],['Azul cielo','#A6DDFC'],['Lila pastel','#D7B9FC']];
+ const adornos = {
+  gold: {nombre:'Purpurina dorada', colores:['#b77903','#eebc3b','#ad7300']},
+  silver: {nombre:'Purpurina plateada', colores:['#647387','#aebac7','#7586a1']},
+  copper: {nombre:'Purpurina cobre', colores:['#9d4624','#cf815a','#e9a07a']},
+  rainbow: {nombre:'Purpurina multicolor', colores:['#d52a73','#a26702','#007e88','#7c48be']},
+  stars: {nombre:'Estrellitas', colores:['#a06b00','#ce8b09','#8053bd'], simbolo:'✦'},
+  hearts: {nombre:'Corazoncitos', colores:['#c62b64','#d95b86','#a64391'], simbolo:'♥'}
+ };
  try {
   const anteriores = JSON.parse(localStorage.getItem(clave) || '{}');
   for (const campo of Object.keys(ajustes)) {
@@ -20,13 +28,14 @@
  <label><input name="modo" type="radio" value="line"> Trazo</label></fieldset>
  <label>Estilo del rastro <select name="estilo"><option value="fine">Láser fino</option><option value="solid">Continuo</option><option value="dots">Punteado</option><option value="dashes">Discontinuo</option><option value="glow">Luminoso</option><option value="marker">Subrayador</option></select></label>
  <label>Cómo se borra <select name="borrado"><option value="auto">Según el estilo</option><option value="smooth">Suave, todo a la vez</option><option value="tail">Desde el principio, como una cola</option><option value="thin">Se afina hasta desaparecer</option><option value="cut">De golpe</option></select></label>
+ <label>Adorno del rastro <select name="adorno"><option value="none">Sin adorno</option>${Object.entries(adornos).map(([valor,{nombre}])=>`<option value="${valor}">${nombre}</option>`).join('')}</select></label>
  <label>Color libre <input name="color" type="color"></label>
  <fieldset><legend>Tonos pastel</legend><div class="paleta-puntero">${tonos.map(([nombre,color])=>`<button type="button" aria-label="${nombre}" title="${nombre}" data-tono="${color}" style="--tono:${color}"></button>`).join('')}</div></fieldset>
  <label>Tamaño <input name="ancho" type="range" min="4" max="45" step="1"><output data-valor="ancho"></output></label>
  <label>Opacidad <input name="opacidad" type="range" min="10" max="100" step="1"><output data-valor="opacidad"></output></label>
  <label>Duración del rastro <input name="duracion" type="range" min=".2" max="8" step=".1"><output data-valor="duracion"></output></label>
  <div class="muestra-puntero"><span>Texto de ejemplo del subrayador</span></div>
- <p>Haz clic o apoya el lápiz para señalar. Con el teclado, elige dónde con las flechas y pulsa Intro para marcar. Escape borra el rastro.</p>`;
+ <p>Arrastra por la pantalla para trazar. Con el teclado, elige dónde con las flechas y pulsa Intro para marcar. Escape borra el rastro.</p>`;
 
  let activo = false;
  let cuadro = 0;
@@ -36,6 +45,7 @@
  let teclado;
  let gesto;
  let suprimirClic = false;
+ let temporizadorClic;
  const duracion = () => ajustes.duracion * 1000;
  const limitar = (n,min=0,max=1) => Math.max(min,Math.min(max,n));
  function actualizarAjustes() {
@@ -75,15 +85,18 @@
   cuadro=0;
   trazos=[];
   trazo=punto=teclado=undefined;
-  if(gesto && superficie.hasPointerCapture(gesto.id)) superficie.releasePointerCapture(gesto.id);
+  const anterior=gesto;
   gesto=undefined;
+  if(anterior && superficie.hasPointerCapture(anterior.id)) superficie.releasePointerCapture(anterior.id);
+  suprimirClic=false;
+  clearTimeout(temporizadorClic);
   ctx.setTransform(1,0,0,1,0,0);
   ctx.clearRect(0,0,lienzo.width,lienzo.height);
  }
  function activarPuntero(valor) {
   activo=valor;
   activar.setAttribute('aria-pressed',String(activo));
-  superficie.classList.toggle('puntero-activo',activo);
+  document.body.classList.toggle('puntero-activo',activo);
   lienzo.hidden=!activo;
   limpiar();
   if(activo) superficie.focus({preventScroll:true});
@@ -99,6 +112,41 @@
  });
  function pedirCuadro() {
   if(!cuadro) cuadro=requestAnimationFrame(dibujar);
+ }
+ function dibujarAdornos(puntos,alpha,factor,adorno) {
+  ctx.globalAlpha=alpha;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  const paso=Math.max(9,ajustes.ancho*.65);
+  for(const [i,p] of puntos.entries()) {
+   const inicio=puntos[i-1] || p;
+   const longitud=p.distancia-inicio.distancia;
+   const primera=i===0 ? Math.ceil(inicio.distancia/paso) : Math.floor(inicio.distancia/paso)+1;
+   const ultima=Math.floor(p.distancia/paso);
+   for(let n=primera;n<=ultima;n++) {
+    const avance=longitud ? (n*paso-inicio.distancia)/longitud : 0;
+    const lado=n%2===0 ? 1 : -1;
+    const desvio=lado*ajustes.ancho*factor*(.32+(n%5)*.08);
+    const dx=longitud ? (p.x-inicio.x)/longitud : 1;
+    const dy=longitud ? (p.y-inicio.y)/longitud : 0;
+    const x=inicio.x+(p.x-inicio.x)*avance-dy*desvio;
+    const y=inicio.y+(p.y-inicio.y)*avance+dx*desvio;
+    const radio=Math.min(3,1.5+(n%4)*.5)*factor;
+    ctx.fillStyle=adorno.colores[n%adorno.colores.length];
+    if(adorno.simbolo){
+     ctx.font=`${Math.max(1,radio*3.6)}px sans-serif`;
+     ctx.fillText(adorno.simbolo,x,y);
+    }else{
+     ctx.beginPath();
+     ctx.moveTo(x,y-radio*1.45);
+     ctx.lineTo(x+radio*.75,y);
+     ctx.lineTo(x,y+radio*1.45);
+     ctx.lineTo(x-radio*.75,y);
+     ctx.closePath();
+     ctx.fill();
+    }
+   }
+  }
  }
  function linea(puntos,alpha,factor,distancia) {
   if(alpha<=0 || factor<=0) return;
@@ -129,6 +177,11 @@
    ctx.lineWidth=Math.max(.5*factor,ctx.lineWidth*.40);
    ctx.stroke();
   }
+  const adorno=adornos[ajustes.adorno];
+  if(adorno) {
+   ctx.shadowBlur=0;
+   dibujarAdornos(puntos,alpha,factor,adorno);
+  }
   ctx.restore();
  }
  function dibujar(ahora) {
@@ -148,11 +201,7 @@
   // Convierte esas coordenadas al espacio real del lienzo, incluso con zoom.
   const escalaX=ancho/caja.width, escalaY=alto/caja.height;
   ctx.setTransform(escalaX,0,0,escalaY,-caja.left*escalaX,-caja.top*escalaY);
-  const r=superficie.getBoundingClientRect();
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(r.left,r.top,r.width,r.height);
-  ctx.clip();
   const opacidad=ajustes.opacidad/100;
   const efecto=ajustes.borrado==='auto'?(ajustes.estilo==='fine'?'smooth':'tail'):ajustes.borrado;
   for(const paso of trazos){
@@ -220,30 +269,35 @@
   }
  }
  const controles='a,button,input,textarea,select,summary,label,[contenteditable]';
- superficie.addEventListener('pointerdown',e=>{
-  if(!activo || gesto || e.button!==0 || e.target.closest(controles)) return;
-  e.preventDefault();
-  superficie.focus({preventScroll:true});
-  gesto={id:e.pointerId};
-  suprimirClic=true;
-  superficie.setPointerCapture(e.pointerId);
+ document.addEventListener('pointerdown',e=>{
+  if(!activo || gesto || e.button!==0 || barra.contains(e.target)) return;
+  const control=e.target.closest(controles);
+  if(control?.matches('textarea,select,[contenteditable],input:not([type=radio]):not([type=checkbox]):not([type=button]):not([type=submit])')) return;
+  clearTimeout(temporizadorClic);
+  suprimirClic=false;
+  gesto={id:e.pointerId,x:e.clientX,y:e.clientY};
+  if(!control) {
+   e.preventDefault();
+   superficie.focus({preventScroll:true});
+   superficie.setPointerCapture(e.pointerId);
+   suprimirClic=true;
+  }
   colocar(e.clientX,e.clientY,true);
  });
- superficie.addEventListener('pointermove',e=>{
+ document.addEventListener('pointermove',e=>{
   if(!activo || gesto?.id!==e.pointerId) return;
-  const caja=superficie.getBoundingClientRect();
-  if(e.clientX<caja.left||e.clientX>=caja.right||e.clientY<caja.top||e.clientY>=caja.bottom){salir();return;}
+  if(Math.hypot(e.clientX-gesto.x,e.clientY-gesto.y)>6) suprimirClic=true;
   colocar(e.clientX,e.clientY,true);
  });
- superficie.addEventListener('pointerleave',salir);
- for(const tipo of ['pointerup','pointercancel','lostpointercapture']) superficie.addEventListener(tipo,e=>{
+ document.addEventListener('dragstart',e=>{if(gesto) e.preventDefault();});
+ for(const tipo of ['pointerup','pointercancel','lostpointercapture']) document.addEventListener(tipo,e=>{
   if(gesto?.id!==e.pointerId) return;
   gesto=undefined;
   salir();
-  setTimeout(()=>{suprimirClic=false;},0);
+  temporizadorClic=setTimeout(()=>{suprimirClic=false;},0);
  });
- superficie.addEventListener('click',e=>{
-  if(suprimirClic){e.preventDefault();e.stopPropagation();}
+ document.addEventListener('click',e=>{
+  if(suprimirClic && e.detail>0){e.preventDefault();e.stopPropagation();}
  },true);
  superficie.addEventListener('keydown',e=>{
   if(!activo||e.target!==superficie) return;
@@ -252,11 +306,9 @@
   const marcar = e.key === 'Enter' || e.key === ' ';
   if(!delta&&!marcar) return;
   e.preventDefault();
-  const r=superficie.getBoundingClientRect();
-  const x0=Math.max(r.left,0),y0=Math.max(r.top,0);
-  const x1=Math.min(r.right,innerWidth),y1=Math.min(r.bottom,innerHeight);
-  teclado ||= {x:(x0+x1)/2,y:(y0+y1)/2};
-  if(delta) teclado={x:limitar(teclado.x+delta[0],x0,x1),y:limitar(teclado.y+delta[1],y0,y1)};
+  const r=lienzo.getBoundingClientRect();
+  teclado ||= {x:(r.left+r.right)/2,y:(r.top+r.bottom)/2};
+  if(delta) teclado={x:limitar(teclado.x+delta[0],r.left,r.right),y:limitar(teclado.y+delta[1],r.top,r.bottom)};
   if(marcar) {
    colocar(teclado.x,teclado.y);
    trazo=undefined;
@@ -270,7 +322,7 @@
   }
   if(activo) limpiar();
  });
- window.addEventListener('blur',salir);
+ window.addEventListener('blur',limpiar);
  for(const evento of ['resize','scroll','hashchange','beforeprint']) window.addEventListener(evento,limpiar);
  for(const evento of ['resize','scroll']) window.visualViewport?.addEventListener(evento,limpiar);
  barra.removeAttribute('hidden');

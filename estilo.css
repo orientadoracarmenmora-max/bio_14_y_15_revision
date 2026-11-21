@@ -69,10 +69,10 @@ textarea{display:block;width:100%;margin:.3rem 0 .85rem;padding:.65rem;backgroun
 .paleta-puntero button[aria-pressed=true]{outline:3px solid var(--accent);outline-offset:2px}
 .muestra-puntero{isolation:isolate;position:relative;background:#fff;color:#26221e;border-radius:.4rem;text-align:center;padding:1rem .3rem;margin:.75rem 0;font-weight:700}
 .muestra-puntero::after{content:"";pointer-events:none;position:absolute;inset-inline:.75rem;top:50%;height:var(--altura-muestra);transform:translateY(-50%);background:var(--color-muestra);opacity:var(--opacidad-muestra);mix-blend-mode:multiply}
-#capa-puntero{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7}
+#capa-puntero{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
 #capa-puntero[hidden]{display:none}
 #capa-puntero.multiplicar{mix-blend-mode:multiply}
-main.puntero-activo{touch-action:none;cursor:crosshair}
+body.puntero-activo{touch-action:none;cursor:crosshair}
 @media print{.barra-puntero,#capa-puntero{display:none!important}}
 @media(max-width:740px){
  .top .settings{position:static}
