@@ -9,9 +9,9 @@
  const esIPad = /iPad/i.test(navigator.userAgent)
   || (/^Mac/i.test(navigator.platform) && navigator.maxTouchPoints > 1);
  const dibujaCon = tipo => tipo==='pen' || (tipo==='mouse' && !esIPad);
- const clave = 'geologia-puntero-v3';
- const ajustes = {modo:'line', estilo:'fine', borrado:'thin', adorno:'none', tinta:'solid', color:'#FFACCA', ancho:23, opacidad:75, duracion:2.2};
- const tonos = [['Amarillo vainilla','#FFE582'],['Rosa pastel','#FFACCA'],['Melocotón pastel','#FFC395'],['Menta pastel','#A9EBC2'],['Azul cielo','#A6DDFC'],['Lila pastel','#D7B9FC']];
+ const clave = 'geologia-puntero-v4';
+ const ajustes = {modo:'line', estilo:'marker', borrado:'thin', adorno:'none', tinta:'solid', color:'#FFC9DE', ancho:23, opacidad:56, duracion:2.2};
+ const tonos = [['Amarillo vainilla','#FFF1B7'],['Rosa pastel','#FFC9DE'],['Melocotón pastel','#FFDAC4'],['Menta pastel','#C9F4DD'],['Azul cielo','#C9EEFF'],['Lila pastel','#E8D8FC']];
  const adornos = {
   gold: {nombre:'Purpurina dorada', colores:['#b77903','#eebc3b','#ad7300']},
   silver: {nombre:'Purpurina plateada', colores:['#647387','#aebac7','#7586a1']},
@@ -49,14 +49,18 @@
  <label><input name="modo" type="radio" value="dot"> Punto</label>
  <label><input name="modo" type="radio" value="line"> Trazo</label></fieldset>
  <label>Estilo del rastro <select name="estilo"><option value="fine">Láser fino</option><option value="solid">Continuo</option><option value="dots">Punteado</option><option value="dashes">Discontinuo</option><option value="glow">Luminoso</option><option value="marker">Subrayador</option></select></label>
- <label>Tinta del trazo <select name="tinta"><option value="solid">Color liso</option>${Object.entries(tintas).map(([valor,{nombre}])=>`<option value="${valor}">${nombre}</option>`).join('')}</select></label>
  <label>Cómo se borra <select name="borrado"><option value="auto">Según el estilo</option><option value="smooth">Suave, todo a la vez</option><option value="tail">Desde el principio, como una cola</option><option value="thin">Se afina hasta desaparecer</option><option value="cut">De golpe</option><option value="keep">Mantener en la vista actual</option></select></label>
+ <div id="efectos-laser-fino" hidden>
+ <label>Tinta del trazo <select name="tinta"><option value="solid">Color liso</option>${Object.entries(tintas).map(([valor,{nombre}])=>`<option value="${valor}">${nombre}</option>`).join('')}</select></label>
  <label>Adorno del rastro <select name="adorno"><option value="none">Sin adorno</option>${Object.entries(adornos).map(([valor,{nombre}])=>`<option value="${valor}">${nombre}</option>`).join('')}</select></label>
+ </div>
  <label>Color libre <input name="color" type="color"></label>
  <fieldset><legend>Tonos pastel</legend><div class="paleta-puntero">${tonos.map(([nombre,color])=>`<button type="button" aria-label="${nombre}" title="${nombre}" data-tono="${color}" style="--tono:${color}"></button>`).join('')}</div></fieldset>
+ <div id="medidas-laser-fino" hidden>
  <label>Tamaño <input name="ancho" type="range" min="4" max="45" step="1"><output data-valor="ancho"></output></label>
  <label>Opacidad <input name="opacidad" type="range" min="10" max="100" step="1"><output data-valor="opacidad"></output></label>
  <label>Duración del rastro <input name="duracion" type="range" min=".2" max="8" step=".1"><output data-valor="duracion"></output></label>
+ </div>
  <div class="muestra-puntero"><span>Texto de ejemplo del subrayador</span></div>
  <button type="button" id="borrar-rastro">Borrar trazos</button>
  <p>${esIPad ? 'Dibuja con el Apple Pencil y usa el dedo para desplazarte o tocar los botones.' : 'Haz clic y arrastra con el trackpad o el ratón para dibujar.'}</p>`;
@@ -71,6 +75,7 @@
  let temporizadorClic;
  const duracion = () => ajustes.duracion * 1000;
  const limitar = (n,min=0,max=1) => Math.max(min,Math.min(max,n));
+ const efectosDisponibles = () => ajustes.modo==='line' && ajustes.estilo==='fine';
  function actualizarAjustes() {
   for (const campo of panel.querySelectorAll('[name]')) {
    const valor = ajustes[campo.name];
@@ -82,7 +87,10 @@
    panel.querySelector(`[data-valor="${nombre}"]`).value = ajustes[nombre]+' '+unidad;
   }
   panel.querySelectorAll('[data-tono]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tono.toLowerCase()===ajustes.color.toLowerCase())));
-  const tinta=tintas[ajustes.tinta];
+  const usarEfectos=efectosDisponibles();
+  panel.querySelector('#efectos-laser-fino').hidden=!usarEfectos;
+  panel.querySelector('#medidas-laser-fino').hidden=!usarEfectos;
+  const tinta=usarEfectos ? tintas[ajustes.tinta] : undefined;
   const muestra = panel.querySelector('.muestra-puntero');
   muestra.style.setProperty('--color-muestra',tinta ? `linear-gradient(90deg,${tinta.colores.join(',')})` : ajustes.color);
   muestra.style.setProperty('--altura-muestra',ajustes.ancho+'px');
@@ -138,6 +146,11 @@
  function pedirCuadro() {
   if(!cuadro) cuadro=requestAnimationFrame(dibujar);
  }
+ function circulo(x,y,radio) {
+  ctx.beginPath();
+  ctx.arc(x,y,radio,0,2*Math.PI);
+  ctx.fill();
+ }
  function dibujarAdornos(puntos,alpha,factor,adorno,ancho) {
   ctx.globalAlpha=alpha;
   ctx.textAlign='center';
@@ -161,15 +174,7 @@
     if(adorno.simbolo){
      ctx.font=`${Math.max(1,radio*3.6)}px sans-serif`;
      ctx.fillText(adorno.simbolo,x,y);
-    }else{
-     ctx.beginPath();
-     ctx.moveTo(x,y-radio*1.45);
-     ctx.lineTo(x+radio*.75,y);
-     ctx.lineTo(x,y+radio*1.45);
-     ctx.lineTo(x-radio*.75,y);
-     ctx.closePath();
-     ctx.fill();
-    }
+    }else circulo(x,y,radio);
    }
   }
  }
@@ -181,7 +186,7 @@
   const fin=tinta.canales[indice%(tinta.canales.length-1)+1];
   return `rgb(${inicio.map((canal,i)=>Math.round(canal+(fin[i]-canal)*fraccion)).join(',')})`;
  }
- function trazarTinta(puntos,tinta,alpha,textura) {
+ function trazarTinta(puntos,tinta,alpha) {
   const ancho=ctx.lineWidth;
   for(let i=0;i<puntos.length;i++) {
    const fin=puntos[i];
@@ -196,13 +201,11 @@
     gradiente.addColorStop(1,colorTinta(tinta,fin.distancia));
    }
    ctx.strokeStyle=gradiente || colorTinta(tinta,fin.distancia);
-   ctx.lineDashOffset=-inicio.distancia;
    ctx.beginPath();
    ctx.moveTo(inicio.x,inicio.y);
    ctx.lineTo(fin.x+(largo>0?0:.01),fin.y);
    ctx.stroke();
   }
-  if(!textura) return;
   ctx.shadowBlur=0;
   // Motas blancas y oscuras dentro de la tinta. La posición depende de la distancia recorrida.
   for (let i=1;i<puntos.length;i++) {
@@ -217,7 +220,7 @@
     const tamano=Math.min(ancho*.19,.55+(n%4)*.24);
     ctx.globalAlpha=alpha*(n%5===0?.26:.64);
     ctx.fillStyle=n%5===0?'#28150e':'#fff9e8';
-    ctx.fillRect(x,y,tamano,tamano);
+    circulo(x,y,tamano/2);
    }
   }
  }
@@ -239,7 +242,7 @@
    ctx.setLineDash([estilo==='dots'?.15:ancho*1.65,ancho*1.7]);
    ctx.lineDashOffset=-distancia;
   }
-  if(tinta) trazarTinta(puntos,tinta,alpha,estilo!=='dots'&&estilo!=='dashes');
+  if(tinta) trazarTinta(puntos,tinta,alpha);
   else {
    ctx.beginPath();
    ctx.moveTo(puntos[0].x,puntos[0].y);
@@ -272,7 +275,7 @@
    const lado=.85+(i%3)*.55;
    ctx.globalAlpha=opacidad/100*(.28+(i%3)*.20);
    ctx.fillStyle=tinta.colores[i%tinta.colores.length];
-   ctx.fillRect(punta.x+Math.cos(angulo)*radio,punta.y+Math.sin(angulo)*radio,lado,lado);
+   circulo(punta.x+Math.cos(angulo)*radio,punta.y+Math.sin(angulo)*radio,lado/2);
   }
  }
  function dibujar(ahora) {
@@ -348,7 +351,12 @@
   if(ajustes.modo==='dot') punto={x,y,tiempo,fijo};
   else {
    if(!trazo || (!gesto && tiempo-trazo.ultimo>=duracion())){
-    trazo={puntos:[],ultimo:tiempo,config:{...ajustes}};
+    const config={...ajustes};
+    if(!efectosDisponibles()) {
+     config.tinta='solid';
+     config.adorno='none';
+    }
+    trazo={puntos:[],ultimo:tiempo,config};
     trazos.push(trazo);
    }
    const anterior=trazo.puntos.at(-1);
