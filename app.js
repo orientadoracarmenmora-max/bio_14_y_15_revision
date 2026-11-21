@@ -28,10 +28,17 @@ function clearActiveSpeaker() {
   activeSpeaker = null;
 }
 const readingPause = 450;
-const defaultVoiceLabel = "Google en español (automática)";
-const googleSpanishVoices = () => (synth?.getVoices() || []).filter(voice =>
-  /^es(?:-|$)/i.test(voice.lang) && /\bgoogle\b/i.test(voice.name + " " + voice.voiceURI));
-const isSpain = voice => voice.lang.toLowerCase() === "es-es";
+const defaultVoiceLabel = "Automática (Google o voz del dispositivo)";
+const spanishVoices = () => (synth?.getVoices() || []).filter(voice => /^es(?:[-_]|$)/i.test(voice.lang));
+const isGoogle = voice => /\bgoogle\b/i.test(voice.name + " " + voice.voiceURI);
+const isSpain = voice => /^es[-_]es$/i.test(voice.lang);
+function deviceVoice(voices) {
+  const available = voices.filter(voice => !isGoogle(voice));
+  return available.find(voice => isSpain(voice) && /\bm[oó]nica\b/iu.test(voice.name))
+    || available.find(isSpain)
+    || available.find(voice => voice.default)
+    || available[0];
+}
 const endsSentence = part => /[.!?][»”"')\]]*$/u.test(part)
   && !/\b(?:p|pp|pág|págs|fig|núm|aprox|etc)\.$/iu.test(part);
 
@@ -60,7 +67,7 @@ function stopSpeech() {
   $("speech-status").textContent = "";
 }
 function fillVoices() {
-  $("voice").replaceChildren(new Option(defaultVoiceLabel,""), ...googleSpanishVoices()
+  $("voice").replaceChildren(new Option(defaultVoiceLabel,""), ...spanishVoices()
     .map(voice => new Option(voice.name + " · " + voice.lang, voice.voiceURI)));
   $("voice").value = state.voice;
   if ($("voice").selectedIndex < 0) $("voice").selectedIndex = 0;
@@ -72,12 +79,10 @@ function speak(area,trigger) {
   }
   if (!synth) { $("speech-status").textContent = "Lectura en voz alta no disponible en este navegador."; return; }
   stopSpeech();
-  const voices = googleSpanishVoices();
-  const voice = voices.find(item => item.voiceURI === state.voice) || voices.find(isSpain) || voices[0];
-  if (!voice) {
-    $("speech-status").textContent = "La voz de Google en español no está disponible en este navegador.";
-    return;
-  }
+  const voices = spanishVoices();
+  const google = voices.filter(isGoogle);
+  let voice = voices.find(item => item.voiceURI === state.voice)
+    || google.find(isSpain) || google[0] || deviceVoice(voices);
   const currentRun = speechRun;
   activeSpeaker = trigger;
   trigger.setAttribute("aria-pressed","true");
@@ -96,18 +101,24 @@ function speak(area,trigger) {
     if (index === chunks.length) { clearActiveSpeaker(); $("speech-status").textContent = "Lectura terminada."; return; }
     const chunk = chunks[index++];
     utterance = new SpeechSynthesisUtterance(chunk);
-    utterance.lang = voice.lang;
-    utterance.voice = voice;
+    utterance.lang = voice ? voice.lang.replace(/_/g,"-") : "es-ES";
+    if (voice) utterance.voice = voice;
     utterance.rate = Number(state.rate);
     utterance.onend = () => {
       if (currentRun !== speechRun) return;
       if (index < chunks.length) speechTimer = setTimeout(next,readingPause);
       else next();
     };
-    utterance.onerror = () => {
+    utterance.onerror = event => {
       if (currentRun !== speechRun) return;
+      if (voice && isGoogle(voice) && ["network","voice-unavailable","language-unavailable","synthesis-failed"].includes(event.error)) {
+        voice = deviceVoice(spanishVoices());
+        index--;
+        next();
+        return;
+      }
       clearActiveSpeaker();
-      $("speech-status").textContent = "No se pudo reproducir la voz de Google. Intenta iniciar la lectura de nuevo.";
+      $("speech-status").textContent = "No se pudo iniciar la lectura. Puedes elegir otra voz en Accesibilidad y lectura.";
     };
     synth.speak(utterance);
   }
