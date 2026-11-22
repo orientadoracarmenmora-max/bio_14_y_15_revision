@@ -1,19 +1,62 @@
 "use strict";
 
+const meteorizacionMecanica = {
+ "gelifraccion": "El agua penetra en las grietas. Al congelarse, aumenta de volumen y ejerce presión sobre sus paredes. Esa presión puede fragmentar la roca.",
+ "descompresion": "Una roca se forma en profundidad, a gran presión. Cuando asciende hacia la superficie, la presión disminuye. Al disminuir la presión, la roca se expande y puede fragmentarse.",
+ "abrasion": "Los clastos que transportan el viento, el agua o el hielo desgastan la roca por rozamiento.",
+ "termoclastia": "En una roca expuesta al sol pueden producirse grandes diferencias de temperatura entre su superficie y su interior. Esto provoca dilataciones desiguales que pueden fracturar y fragmentar la roca."
+};
+const raicesMeteorizacion = "Las raíces de los árboles ensanchan las grietas de forma parecida a la gelifracción.";
+
 const meteorizacionQuimica = {
- oxidacion: "Algunos minerales, como los sulfuros, reaccionan con el oxígeno del aire y pueden formar óxidos e hidróxidos de hierro, cobre o aluminio.",
- disolucion: "En contacto con el agua, los minerales solubles, como la halita, la silvina, la carnalita o el yeso, se separan en iones que pasan al agua.",
+ oxidacion: "Algunos minerales, como los sulfuros, reaccionan con el oxígeno y forman óxidos e hidróxidos.",
+ disolucion: "En contacto con el agua, los minerales solubles se separan en iones que pasan al agua. Algunos ejemplos son la halita, la silvina, la carnalita y el yeso.",
  carbonatacion: "El agua con dióxido de carbono facilita la disolución de algunos minerales, como la calcita.",
- hidrolisis: "Los iones hidrógeno (H⁺) e hidroxilo (OH⁻) presentes en el agua rompen la estructura cristalina de un mineral. Los carbonatos y los feldespatos son más solubles en medio ácido. El cuarzo es más soluble en medio alcalino."
+ hidrolisis: "Los iones de hidrógeno (H⁺) e hidroxilo (OH⁻) presentes en el agua rompen la estructura cristalina de un mineral. Los carbonatos y los feldespatos son más solubles en medio ácido. El cuarzo es más soluble en medio alcalino."
 };
 
 const definicionEdafizacion = "La edafización es el proceso por el que el detrito, también llamado regolito, se transforma en un suelo fértil.";
 const factoresEdafizacion = [
- ["Presencia de seres vivos", "Los seres vivos actúan de forma mecánica y química sobre el detrito. Mezclan sus componentes y aumentan su porosidad y su capacidad para contener agua. También aportan sustancias que favorecen la meteorización química. La descomposición de los restos orgánicos forma el humus, que es la fracción orgánica del suelo."],
- ["Pendiente del terreno", "En pendientes muy pronunciadas, el detrito se vuelve inestable y puede desplazarse, lo que dificulta o impide la edafización. En zonas llanas, el detrito es más estable y se favorece la formación del suelo."],
- ["Clima", "Los climas cálidos y húmedos favorecen la actividad de los seres vivos y aceleran la formación del suelo. En climas glaciares y desérticos, la actividad biológica es muy limitada y la formación del suelo se dificulta."],
- ["Tiempo", "La formación de un suelo tarda décadas o siglos. Durante ese tiempo se altera el material de partida, se acumula materia orgánica y se desarrollan los horizontes."],
- ["Otros factores", "También influyen el tipo de roca de partida, el aporte de sedimentos por agentes geológicos y la cantidad de nutrientes inorgánicos disponibles, como los nitratos y los fosfatos."]
+ ["Presencia de seres vivos", [
+   "Mezclan los componentes del detrito.",
+   "Aumentan la <strong>porosidad</strong> y la capacidad de retener agua.",
+   "Al <strong>aportar sustancias</strong>, favorecen la meteorización química.",
+   "La <strong>descomposición de los restos orgánicos</strong> forma <strong>humus</strong>."
+ ], "Los seres vivos actúan de forma <strong>mecánica</strong> y <strong>química</strong> sobre el suelo en formación."],
+ ["Pendiente del terreno", [
+   "En <strong>pendientes pronunciadas</strong>, el detrito puede desplazarse, lo que impide la formación del suelo (edafización).",
+   "En <strong>zonas llanas</strong>, el detrito es más estable y se favorece la formación del suelo (edafización)."
+ ]],
+ ["El clima", [
+   "En <strong>climas húmedos y cálidos</strong>, hay más actividad biológica. El suelo se forma más deprisa.",
+   "En <strong>climas glaciares y desérticos</strong>, hay menos actividad biológica. Por eso es más difícil que se forme el suelo."
+ ]],
+ ["El tiempo", [
+   "El suelo tarda décadas o siglos en formarse."
+ ]],
+ ["Otros factores", [
+   "El tipo de roca de partida.",
+   "El aporte de sedimentos por los agentes geológicos.",
+   "La cantidad de nutrientes inorgánicos, como los nitratos y los fosfatos."
+ ]]
+];
+
+const resumenFactorEdafizacion = ([, puntos, introduccion]) =>
+ [introduccion, ...puntos].filter(Boolean).join(" ").replace(/<\/?strong>/g, "");
+
+const horizontesDelSuelo = [
+ "El <strong>horizonte O</strong> (cero) es el <strong>mantillo superficial</strong>, reconocible por las hojas y otros restos orgánicos. Los descomponedores transforman parte de esos restos en <strong>humus</strong>.",
+ "En el <strong>horizonte A</strong>, el agua de lluvia que se infiltra arrastra sustancias solubles y algunos componentes del humus. Por eso es la zona de <strong>lavado</strong>.",
+ "El <strong>horizonte B</strong> se encuentra por debajo del A y <strong>acumula</strong> parte del material arrastrado.",
+ "El <strong>horizonte C</strong> contiene fragmentos y restos de la meteorización de la <strong>roca madre</strong>."
+];
+
+const relacionTransporteTextural = "Cuanto más largo es el transporte, más pequeños y redondeados se hacen los clastos.";
+
+const madurezMineralogica = [
+ "La <strong>madurez mineralógica</strong> indica cuánto ha cambiado la <strong>composición mineral</strong> del sedimento durante la alteración. Los minerales que se alteran con facilidad van siendo menos abundantes.",
+ "El <strong>cuarzo</strong> resiste mejor la alteración. Por eso aumenta su proporción respecto a otros minerales. Si abunda, indica una <strong>madurez mineralógica alta</strong>.",
+ "Las <strong>micas</strong> y los <strong>feldespatos</strong> pueden alterarse y formar <strong>minerales de arcilla</strong>. En el ejemplo del tema, su abundancia también puede indicar una <strong>alteración química prolongada</strong>."
 ];
 
 const externos = [
@@ -22,9 +65,9 @@ const externos = [
  idea:"La <strong>meteorización</strong> es la <strong>fragmentación física</strong> de las rocas o la <strong>alteración química</strong> de sus minerales en la superficie terrestre, en el lugar donde se encuentran. La <strong>erosión</strong> consiste en la retirada y movilización de materiales por agentes como el agua, el viento o el hielo.",
  bloques:[
  ["Tres formas de alterar una roca","La <strong>meteorización</strong> es la alteración de las rocas en la superficie terrestre por la acción de los agentes atmosféricos y los seres vivos. La meteorización <strong>mecánica</strong> fragmenta la roca sin modificar su composición mineralógica o química. La <strong>química</strong> altera los minerales que la componen. La <strong>biológica</strong> se debe a la actividad de los seres vivos y puede actuar de forma mecánica o química. Los fragmentos se llaman <strong>clastos</strong>. Si se acumulan donde se han formado, constituyen el <strong>detrito</strong>."],
- ["Meteorización mecánica","<strong>Gelifracción.</strong> El agua que penetra en las grietas aumenta de volumen al congelarse y ejerce presión sobre sus paredes, como una cuña. En zonas de mucha pendiente, los fragmentos pueden acumularse y formar <strong>canchales</strong>. <strong>Descompresión.</strong> Las rocas formadas a gran presión se expanden cuando ascienden hacia la superficie y esa presión disminuye. La expansión puede abrir <strong>diaclasas</strong>. <strong>Abrasión.</strong> Los clastos que transportan el viento, el agua o el hielo desgastan la roca por rozamiento. En una roca en seta, la arena que arrastra el viento desgasta especialmente la base. <strong>Termoclastia.</strong> La superficie de una roca expuesta al sol y su interior pueden alcanzar temperaturas diferentes. Los minerales se dilatan de manera desigual y generan tensiones que pueden fracturar la roca."],
+ ["Meteorización mecánica",`<strong>Gelifracción.</strong> ${meteorizacionMecanica.gelifraccion} <strong>Descompresión.</strong> ${meteorizacionMecanica.descompresion} <strong>Abrasión.</strong> ${meteorizacionMecanica.abrasion} <strong>Termoclastia.</strong> ${meteorizacionMecanica.termoclastia}`],
  ["Meteorización química",`<strong>Oxidación.</strong> ${meteorizacionQuimica.oxidacion} <strong>Disolución.</strong> ${meteorizacionQuimica.disolucion} <strong>Carbonatación.</strong> ${meteorizacionQuimica.carbonatacion} <strong>Hidrólisis.</strong> ${meteorizacionQuimica.hidrolisis}`],
- ["Meteorización biológica","Se debe a la acción de los seres vivos y puede ser mecánica o química. La <strong>fotosíntesis</strong> aporta oxígeno al agua y al aire, lo que aumenta su capacidad de oxidar minerales. La <strong>cubierta herbácea</strong> conserva la humedad del suelo y favorece la oxidación, la carbonatación y la disolución de minerales. La <strong>respiración</strong> de los seres vivos y algunos procesos de <strong>descomposición</strong> realizados por bacterias y hongos aportan dióxido de carbono al agua. Así aumentan su acidez y su capacidad de producir carbonatación. Las <strong>raíces</strong> de los árboles actúan como cuñas y ensanchan las grietas de las rocas, de forma parecida a la gelifracción."]
+ ["Meteorización biológica",`Se debe a la acción de los seres vivos y puede ser mecánica o química. La <strong>fotosíntesis</strong> aporta oxígeno al agua y al aire, lo que aumenta su capacidad de oxidar minerales. La <strong>cubierta herbácea</strong> conserva la humedad del suelo y favorece la oxidación, la carbonatación y la disolución de minerales. La <strong>respiración</strong> de los seres vivos y algunos procesos de <strong>descomposición</strong> realizados por bacterias y hongos aportan dióxido de carbono al agua. Así aumentan su acidez y su capacidad de producir carbonatación. ${raicesMeteorizacion.replace("raíces","<strong>raíces</strong>")}`]
  ],
  esquema:["Roca expuesta","Alteración física, química o biológica","Clastos y material alterado"],
  ejemplo:"Un bloque se agrieta tras repetidos calentamientos y enfriamientos, sin agua que se congele. La pista es la dilatación desigual: <strong>termoclastia</strong>."
@@ -33,8 +76,8 @@ const externos = [
  id:"suelo", titulo:"Edafización o formación del suelo", paginas:"270–271", tema:14,
  idea:definicionEdafizacion,
  bloques:[
- ["Factores de la edafización",`La meteorización desprende fragmentos de roca llamados <strong>clastos</strong>. Cuando se acumulan, forman una cubierta de materiales sueltos que recibe el nombre de <strong>detrito o regolito</strong>. La <strong>edafización</strong> transforma ese detrito en suelo fértil. ${factoresEdafizacion.map(([factor, detalle]) => `<strong>${factor}.</strong> ${detalle}`).join(" ")} <strong>El suelo como recurso.</strong> Sirve de soporte para los ecosistemas terrestres y la agricultura. Su contaminación o alteración puede perjudicar a ambos.`],
- ["Estructura del suelo","<strong>Horizonte O.</strong> El mantillo superficial contiene hojas, ramitas y otros restos orgánicos. Los descomponedores transforman parte de esos restos en <strong>humus</strong>. <strong>Horizonte A.</strong> El agua de lluvia que se infiltra arrastra sustancias solubles y parte del humus. Es la zona de <strong>lavado</strong>. <strong>Horizonte B.</strong> Acumula parte del material arrastrado desde arriba. <strong>Horizonte C.</strong> Contiene fragmentos y restos de la meteorización de la roca madre. En el perfil pueden verse también zonas de roca sin alterar. Para identificar cada capa, fíjate en su posición y en su contenido."],
+ ["Factores de la edafización",`La meteorización desprende fragmentos de roca llamados <strong>clastos</strong>. Cuando se acumulan, forman una cubierta de materiales sueltos que recibe el nombre de <strong>detrito o regolito</strong>. La <strong>edafización</strong> transforma ese detrito en suelo fértil.`,factoresEdafizacion.map(([factor, puntos, introduccion], index) => [`factor-${index}`, factor, puntos, introduccion])],
+ ["Estructura del suelo",horizontesDelSuelo],
  ["Propiedades del suelo","La <strong>textura</strong> indica qué proporción de arena, limo y arcilla hay en la parte mineral del suelo. La arena tiene los granos más grandes. El limo tiene un tamaño intermedio y la arcilla, el más pequeño. Un suelo <strong>franco</strong> tiene una mezcla equilibrada de los tres. La <strong>porosidad</strong> es el porcentaje del suelo ocupado por huecos que pueden contener aire o agua. La <strong>permeabilidad</strong> es la facilidad con que el agua circula por esos huecos. Un suelo muy arcilloso puede retener mucha agua y, aun así, ser poco permeable porque el agua circula lentamente por sus poros pequeños."],
  ["Fertilidad del suelo","Un suelo es más <strong>fértil</strong> si favorece el crecimiento de las plantas. Ayudan la presencia de <strong>humus</strong> y de nutrientes disponibles, como nitratos y fosfatos. También influyen el agua disponible y la aireación del suelo."],
  ["Tipos de suelos","<strong>Podsol.</strong> En un clima húmedo y con poca evaporación, el agua se infiltra y desciende. El agua arrastra muchas sales del horizonte A. Esa capa queda pobre en sales y toma un color grisáceo. <strong>Suelo pardo.</strong> En la época lluviosa, el agua se infiltra en el suelo. En verano puede subir por los poros, por <strong>ascenso capilar</strong>. Por eso cuesta distinguir los horizontes A y B. <strong>Caliche.</strong> En un clima muy seco y caluroso, el agua sube por los poros del suelo. Este movimiento se llama <strong>ascenso capilar</strong>. Al evaporarse el agua, las sales o la cal pueden formar una costra cerca de la superficie. <strong>Litosuelo o suelo rocoso.</strong> Tiene poco espesor y sus horizontes apenas se distinguen. Se forma sobre roca madre poco o nada alterada."]
@@ -47,9 +90,21 @@ const externos = [
  idea:"La <strong>erosión</strong> retira y moviliza materiales. El <strong>transporte</strong> es su desplazamiento. La <strong>sedimentación</strong> es el depósito de los materiales transportados.",
  bloques:[
  ["Detrito y sedimento","Los <strong>clastos</strong> son fragmentos de roca producidos por la meteorización. Al acumularse en el lugar donde se formaron constituyen el <strong>detrito</strong> o regolito. En la <strong>erosión</strong>, un agente geológico recoge los clastos del detrito o arranca fragmentos de la roca y los pone en movimiento. Cuando el agente arrastra el material, este pasa a llamarse <strong>sedimento</strong>. Ya tiene ese nombre durante el viaje. El <strong>transporte</strong> es su desplazamiento. La <strong>sedimentación</strong> ocurre cuando el agente deja de arrastrarlo y lo deposita."],
- ["Gravedad y agentes geológicos","La <strong>gravedad</strong> puede desplazar el detrito directamente pendiente abajo. En pendientes abruptas pueden desprenderse bloques. Las lluvias intensas o el deshielo pueden empapar los materiales arcillosos. Entonces se deforman con más facilidad y puede haber corrimientos de tierras. Estos movimientos suelen acumular material al pie de la pendiente. Los <strong>agentes geológicos</strong>, como el agua, el viento y el hielo, pueden transportarlo a distancias mayores. Un agente también puede recoger sedimentos que otro ya había depositado."],
+ ["Gravedad y agentes geológicos",
+  "Los <strong>clastos</strong> pueden ponerse en movimiento y acumularse en otras zonas por la acción de la <strong>gravedad</strong> o de los <strong>agentes geológicos</strong>.",
+  [
+   ["gravedad","Gravedad",[
+    "Los <strong>procesos gravitacionales</strong> trasladan los materiales <strong>hasta el pie de la pendiente</strong>.",
+    "En pendientes muy inclinadas pueden desprenderse bloques.",
+    "Si la lluvia intensa o el deshielo empapan los materiales arcillosos, pueden producirse <strong>corrimientos de tierras</strong>."
+   ]],
+   ["agentes","Agentes geológicos",[
+    "El <strong>agua</strong>, el <strong>viento</strong> y el <strong>hielo</strong> pueden transportar los clastos <strong>a grandes distancias</strong>.",
+    "Un agente también puede recoger sedimentos que otro ya había depositado."
+   ]]
+  ]],
  ["Cómo se transporta una partícula","<strong>En contacto con el fondo.</strong> En la <strong>reptación</strong>, la partícula se arrastra. En la <strong>rodadura</strong>, gira sobre el fondo. En la <strong>saltación</strong>, se levanta y vuelve a tocarlo en saltos sucesivos. <strong>Separada del fondo.</strong> En <strong>suspensión</strong>, la partícula viaja dentro del fluido. En <strong>flotación</strong>, viaja por la superficie. En <strong>disolución</strong>, el agua transporta sustancias disueltas, por ejemplo iones."],
- ["Madurez a partir de características","Un sedimento formado por <strong>clastos muy pequeños y redondeados</strong> tiene <strong>madurez textural alta</strong>. Durante el transporte, los golpes y el roce tienden a reducir el tamaño de los clastos y a redondear sus bordes. En el ejemplo del tema, la <strong>arena de playa</strong> presenta madurez textural alta. El <strong>sedimento glaciar</strong> del ejemplo presenta menor madurez textural y contiene fragmentos angulosos de distintos tamaños. Cada agente geológico modifica los clastos de forma distinta. <strong>Madurez mineralógica.</strong> Indica cuánto ha cambiado la composición mineral del sedimento durante la alteración. Los minerales que se alteran con facilidad van siendo menos abundantes. Los más estables, como el <strong>cuarzo</strong>, resisten mejor y pasan a representar una proporción mayor. Por eso, la abundancia de cuarzo indica alta madurez mineralógica. Las <strong>micas</strong> y los <strong>feldespatos</strong> pueden alterarse químicamente y dar lugar a <strong>minerales de arcilla</strong>. Según el ejemplo del tema, la abundancia de estos minerales de arcilla también puede indicar que el sedimento ha pasado por una alteración química prolongada."],
+ ["Madurez textural",`${relacionTransporteTextural} Un sedimento formado por <strong>clastos muy pequeños y redondeados</strong> tiene <strong>madurez textural alta</strong>. Durante el transporte, los golpes y el roce tienden a reducir el tamaño de los clastos y a redondear sus bordes. En el ejemplo del tema, la <strong>arena de playa</strong> presenta madurez textural alta. El <strong>sedimento glaciar</strong> del ejemplo presenta menor madurez textural y contiene fragmentos angulosos de distintos tamaños. Cada agente geológico modifica los clastos de forma distinta.`,[["madurez-mineralogica","Madurez mineralógica",madurezMineralogica]]],
  ["La sedimentación","La <strong>sedimentación</strong> es el depósito de los materiales que un agente geológico transportaba. <strong>Dos modos de depósito.</strong> Depósito gravitacional y acreción cinética. <strong>Depósito gravitacional.</strong> Cuando la corriente pierde energía, deja de sostener parte de la carga y los clastos caen al fondo por gravedad. <strong>Acreción cinética.</strong> Los clastos que aún se están moviendo tropiezan con un obstáculo y se acumulan. Esta acumulación puede dar lugar a formas como dunas o barras. Los materiales depositados pueden sufrir erosión de nuevo. Si llegan a una <strong>cuenca sedimentaria</strong>, pueden acumularse allí en capas."]
  ],
  esquema:["Meteorización","Erosión","Transporte","Sedimentación"],

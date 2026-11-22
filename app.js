@@ -153,10 +153,16 @@ document.querySelector(".skip").addEventListener("click", event => {
 
 const button = (href,label,primary=false) => `<a class="button ${primary ? "primary" : ""}" href="#${href}">${label}</a>`;
 const speaker = (label,attributes="") => `<button type="button" class="speaker" aria-pressed="false" aria-label="${label}" title="${label}" ${attributes}><span aria-hidden="true">🔊</span></button>`;
-const explanation = content => content.split(/(?<=[.!?])\s+(?=(?:<strong>)?[A-ZÁÉÍÓÚÜÑ¿¡])/u)
-  .map(sentence => `<p>${sentence}</p>`).join("");
-const modelTerms = /(?<![\p{L}])(?:formación de magma|estado sólido|fusión parcial|falla transformante|esfuerzos tectónicos|presión litostática|esfuerzos dirigidos|cámara magmática|colada de lava|metamorfismo de contacto|metamorfismo dinámico|metamorfismo regional|estructura granoblástica|madurez textural|depósito gravitacional|acreción cinética|plano de falla|plano axial|horizonte [OABC]|roca madre|regolito|humus|granito de anatexia|minerales de arcilla|carbonato de calcio|magmatismo|metamorfismo|subducción|compresión|cizalla|distensión|fusión|magma|piroclastos|lapilli|ceniza|lava|conos?|chimenea|cráter|caldera|plutón|dique|viscosidad|sílice|presión|temperatura|granito|obsidiana|pumita|basalto|fanerítica|microcristalina|vítrea|porfídica|vacuolar|foliación|blastesis|arcilla|pizarra|filita|esquisto|gneis|anatexia|corneana|milonita|cuarcita|mármol|silicatos?|olivino|granates|charnela|labios|salto|flancos|pliegue|diaclasa|falla|meteorización|erosión|gelifracción|termoclastia|descompresión|abrasión|oxidación|disolución|carbonatación|hidrólisis|edafización|caliche|litosuelo|porosidad|permeabilidad|fertilidad|textura|estructura|lavado|acumulación|detrito|sedimentación|suspensión|saltación|rodadura|diagénesis|compactación|cementación|sedimentos|clastos|enterramiento|litificación|conglomerado|pudinga|brecha|arenisca|marga|cuarzo|yeso|halita|calcita)(?![\p{L}])/giu;
-const modelExplanation = text => `<div class="explanation model-explanation">${explanation(text.replace(modelTerms,term=>`<strong>${term}</strong>`))}</div>`;
+const studyPoints = points =>
+  `<ul class="study-points">${points.map(point => `<li>${point}</li>`).join("")}</ul>`;
+
+const explanation = content => {
+  if (Array.isArray(content)) return studyPoints(content);
+  const points = content.split(/(?<=[.!?])\s+(?=(?:<strong>)?[A-ZÁÉÍÓÚÜÑ¿¡])/u);
+  return points.length > 1 ? studyPoints(points) : `<p>${content}</p>`;
+};
+const modelTerms = /(?<![\p{L}])(?:climas húmedos y cálidos|climas glaciares y desérticos|pendientes pronunciadas|zonas llanas|formación de magma|estado sólido|fusión parcial|falla transformante|esfuerzos tectónicos|presión litostática|esfuerzos dirigidos|cámara magmática|colada de lava|metamorfismo de contacto|metamorfismo dinámico|metamorfismo regional|estructura granoblástica|madurez textural|depósito gravitacional|acreción cinética|plano de falla|plano axial|horizonte [OABC]|roca madre|regolito|humus|granito de anatexia|minerales de arcilla|carbonato de calcio|magmatismo|metamorfismo|subducción|compresión|cizalla|distensión|fusión|magma|piroclastos|lapilli|ceniza|lava|conos?|chimenea|cráter|caldera|plutón|dique|viscosidad|sílice|presión|temperatura|granito|obsidiana|pumita|basalto|fanerítica|microcristalina|vítrea|porfídica|vacuolar|foliación|blastesis|arcilla|pizarra|filita|esquisto|gneis|anatexia|corneana|milonita|cuarcita|mármol|silicatos?|olivino|granates|charnela|labios|salto|flancos|pliegue|diaclasa|falla|meteorización mecánica|química|biológica|meteorización|erosión|gelifracción|termoclastia|descompresión|abrasión|oxidación|disolución|carbonatación|hidrólisis|edafización|caliche|litosuelo|porosidad|permeabilidad|fertilidad|textura|estructura|lavado|acumulación|detrito|sedimentación|suspensión|saltación|rodadura|diagénesis|compactación|cementación|sedimentos|clastos|enterramiento|litificación|conglomerado|pudinga|brecha|arenisca|marga|cuarzo|yeso|halita|calcita)(?![\p{L}])/giu;
+const modelExplanation = text => `<div class="explanation model-explanation">${explanation(Array.isArray(text) ? text : text.replace(modelTerms,term=>`<strong>${term}</strong>`))}</div>`;
 const flow = items => `<ol class="diagram">${items.map(item => `<li>${item}</li>`).join("")}</ol>`;
 const visual = {
   magma: `<figure><div class="volcano" aria-hidden="true"><span class="cone"></span><span class="vent"></span><span class="chamber"></span></div>
@@ -167,15 +173,15 @@ const visual = {
 };
 const examExternal = `<div class="grid"><section class="card"><h2>Qué entra · Tema 14</h2><ul>
 <li><strong>Meteorización.</strong> Define la meteorización y estudia los procesos mecánicos, químicos y biológicos. La profesora puede dar el nombre de un mecanismo, por ejemplo termoclastia, y pedir que lo expliques, o dar sus características y pedir que lo identifiques.</li>
-<li><strong>Edafización o formación del suelo (p. 270).</strong> La profesora destaca cuatro factores: seres vivos, pendiente, clima y tiempo. Puede poner un dibujo de la estructura del suelo para identificar los horizontes O, A, B y C.</li>
+<li><strong>Edafización o formación del suelo.</strong> La profesora destaca cuatro factores: seres vivos, pendiente, clima y tiempo. Puede poner un dibujo de la estructura del suelo para identificar los horizontes O, A, B y C.</li>
 <li><strong>Propiedades del suelo.</strong> Define textura, porosidad y permeabilidad. Explica qué factores favorecen un suelo más fértil.</li>
 <li><strong>Tipos de suelos.</strong> Presta especial atención a distinguir el caliche del suelo rocoso o litosuelo.</li>
 <li><strong>Erosión, transporte y sedimentación.</strong> Define erosión y distingue detrito, sedimento y sedimentación. Reconoce los modos de transporte y compara la madurez textural de dos muestras a partir de una imagen. En la sedimentación, distingue los dos modos de depósito: depósito gravitacional y acreción cinética.</li>
 <li><strong>Rocas sedimentarias.</strong> Explica las características de un tipo de roca o identifícalo a partir de ellas. Repasa brevemente cuarzo, minerales de arcilla, yeso, halita y calcita.</li></ul></section>
-<section class="card"><h2>Qué se excluye</h2><p>El punto 6, dedicado a los modelados.</p><p class="muted">En el audio se menciona la p. 265 al hablar de meteorización. En el PDF de estudio, la meteorización está en las pp. 268–269 y la edafización en la p. 270.</p></section></div>`;
+<section class="card"><h2>Qué se excluye</h2><p>El punto 6, dedicado a los modelados.</p></section></div>`;
 const exam = `<div class="notice"><h2>Pregunta segura del tema 15</h2><p>Explica la serie regional desde el ambiente sedimentario hasta el magmático y cómo cambian las rocas al aumentar la presión y la temperatura.</p><p><strong>Arcilla → pizarra → filita → esquisto → gneis → granito de anatexia.</strong> Al final, la fusión parcial origina un magma que, al enfriarse y solidificarse, puede formar granito.</p></div>
 <div class="grid"><section class="card"><h2>Qué entra · Tema 15</h2><ul>
-<li><strong>Procesos internos.</strong> Distingue magmatismo, metamorfismo y esfuerzos. Interpreta el bloque diagrama de la p. 288. Define el magma y explica sus componentes. De los emplazamientos intrusivos, estudia el plutón y el dique.</li>
+<li><strong>Procesos internos.</strong> Distingue magmatismo, metamorfismo y esfuerzos. Interpreta el bloque diagrama. Define el magma y explica sus componentes. De los emplazamientos intrusivos, estudia el plutón y el dique.</li>
 <li><strong>Vulcanismo.</strong> Explica cómo se produce una erupción, cuáles son sus productos y cómo influyen la composición, la temperatura, los gases disueltos y el lugar de la erupción. Identifica la caldera, la cámara magmática, la chimenea, el cono y el cráter.</li>
 <li><strong>Rocas ígneas.</strong> Relaciona el enfriamiento con las rocas volcánicas, plutónicas y filonianas. Distingue textura y estructura. Repasa fanerítica o fanerocristalina, microcristalina, vítrea, porfídica y vacuolar. Practica describir e identificar las rocas plutónicas y volcánicas.</li>
 <li><strong>Metamorfismo.</strong> Define el proceso, explica sus factores y los cambios de color, densidad, tenacidad, textura y estructura. Distingue metamorfismo dinámico, térmico o de contacto, y regional.</li>
@@ -183,13 +189,13 @@ const exam = `<div class="notice"><h2>Pregunta segura del tema 15</h2><p>Explica
 <li><strong>Minerales y ciclo de las rocas.</strong> Define los silicatos. Repasa el olivino como ejemplo magmático y los granates como ejemplo metamórfico. Estudia el esquema simplificado del ciclo.</li>
 <li><strong>Esfuerzos.</strong> Define pliegue y falla. La profesora anuncia que pondrá un pliegue o una falla para que se expliquen sus elementos principales.</li></ul></section>
 <section class="card"><h2>Qué se excluye</h2><ul>
-<li>Tipos de actividad volcánica hawaiana, estromboliana y peleana, y el recuadro azul de la p. 291.</li>
+<li>Tipos de actividad volcánica hawaiana, estromboliana y peleana, y el recuadro azul.</li>
 <li>Textura criptocristalina, diabasa y microscopio petrográfico.</li>
 <li>Estructuras de los silicatos y actividad sísmica.</li></ul></section></div>`;
 
 const bookImages = {
   meteorizacion: [["14-mecanica","Tipos de meteorización mecánica","Recuadro con las cuatro fotografías en su orden original: gelifracción, descompresión, abrasión y termoclastia.","268"],["14-raices","Raíces y meteorización","Raíces de árbol que ocupan y ensanchan grietas de una roca.","269"]],
-  suelo: [["14-horizontes","Perfil real de un suelo","Corte vertical con vegetación y capas de diferente color sobre la roca.","270"],["14-propiedades-suelo","Textura, porosidad y permeabilidad","Recuadro con los tamaños de arena, limo y arcilla y la comparación de poros entre un suelo arenoso y uno arcilloso.","271"],["14-suelos","Tipos de suelos","Recuadro completo. De izquierda a derecha: podsol, caliche, suelo pardo y litosuelo o suelo rocoso.","271",15]],
+  suelo: [["14-horizontes","Estructura del suelo","Perfil con cuatro flechas. La flecha de la izquierda señala el horizonte O o mantillo. Las de la derecha señalan, de arriba abajo, los horizontes A, B y C.","270",16],["14-propiedades-suelo","Textura, porosidad y permeabilidad","Recuadro con los tamaños de arena, limo y arcilla y la comparación de poros entre un suelo arenoso y uno arcilloso.","271"],["14-suelos","Tipos de suelos","Recuadro completo. De izquierda a derecha: podsol, caliche, suelo pardo y litosuelo o suelo rocoso.","271",15]],
   sedimentos: [["14-transporte","Cómo viajan las partículas","Esquema del libro con suspensión, flotación, disolución, reptación, saltación y rodadura.","272"],["14-madurez","Compara las muestras A y B","A muestra arena de playa fina; B muestra fragmentos angulosos de un sedimento glaciar.","273"],["14-depositos","Dos formas de depósito","Cantos en un cauce y barras arenosas vistas desde arriba.","273"]],
   sedimentarias: [["14-sedimentarias","Rocas detríticas","Recuadro completo con conglomerados, areniscas y arcillas y limos. Incluye los tamaños de los clastos y una foto en cada columna.","274",15],["14-carbonatadas","Calizas y dolomías","Recuadro de las rocas carbonatadas. A la izquierda, una caliza. A la derecha, una dolomía.","274"],["14-evaporiticas","Yesos y sales","Recuadro de las rocas evaporíticas. A la izquierda, una roca de yeso. A la derecha, una muestra de sales.","275"],["14-organicas","Carbones y petróleo","Recuadro de las rocas orgánicas con fotografías de turba, antracita y petróleo.","275"],["14-margas","Margas · 4.3. Rocas mixtas","Recuadro de las margas con su fotografía y composición: carbonato de calcio y una parte importante de limo o arcilla.","275"],
     ["14-cuarzo","Cuarzo","Muestra de cuarzo blanquecino.","277"],
@@ -206,33 +212,38 @@ const bookImages = {
 const studyQuestions = {
   meteorizacion: [
     ["¿Qué es la meteorización? Nombra y define sus tres tipos.","Es la alteración de las rocas en la superficie terrestre, en el lugar donde se encuentran. La meteorización mecánica fragmenta la roca sin cambiar su composición. La química altera los minerales que la componen. La biológica se debe a la acción de los seres vivos, que pueden fragmentar la roca o alterar sus minerales.",true],
-    ["¿Qué es la meteorización? Explica en qué se diferencia de la erosión.","La meteorización altera los minerales o fragmenta la roca en superficie, en el mismo lugar donde se encuentra. Por ejemplo, cuando el agua se congela en una grieta y la ensancha, la roca se meteoriza. Si una corriente recoge después los clastos y los pone en movimiento, se produce erosión. Los fragmentos que permanecen acumulados donde se formaron constituyen el detrito."],
 
   ],
   suelo: [
-    ["¿Qué es la edafización? Explica cómo influyen los seres vivos, la pendiente, el clima y el tiempo en la formación del suelo.", [definicionEdafizacion, ...factoresEdafizacion.slice(0,4).map(([factor, detalle]) => `${factor}. ${detalle}`)].join(" "),true],
+    ["¿Qué es la edafización? Explica cómo influyen los seres vivos, la pendiente, el clima y el tiempo en la formación del suelo.", [definicionEdafizacion, ...factoresEdafizacion.slice(0,4).map(factor => `${factor[0]}. ${resumenFactorEdafizacion(factor)}`)].join(" "),true],
     ["Antes de que se forme el suelo, ¿cómo se llama la cubierta de fragmentos sueltos? Explica cómo se origina.","Se llama detrito o regolito. La meteorización desprende fragmentos de roca llamados clastos. Cuando se acumulan, forman esa cubierta de materiales sueltos. La edafización transforma el detrito en suelo fértil."],
-    ["Además de los seres vivos, la pendiente, el clima y el tiempo, ¿qué otros factores influyen en la edafización según la página 270?",factoresEdafizacion[4][1]],
-    ["En un perfil, ¿cómo distingues los horizontes O, A, B y C?","El horizonte O es el mantillo superficial, reconocible por las hojas y otros restos orgánicos. En el horizonte A, el agua de lluvia que se infiltra arrastra sustancias solubles y algunos componentes del humus. Por eso es la zona de lavado. El horizonte B se encuentra por debajo del A y acumula parte del material arrastrado. El horizonte C contiene fragmentos y restos de la meteorización de la roca madre.",true],
+    ["Además de los seres vivos, la pendiente, el clima y el tiempo, ¿qué otros factores influyen en la edafización?",resumenFactorEdafizacion(factoresEdafizacion[4])],
+    ["En un perfil, ¿cómo distingues los horizontes O, A, B y C?",horizontesDelSuelo,true],
     ["Define la textura, la porosidad y la permeabilidad del suelo. ¿Puede un suelo arcilloso tener mucha porosidad y dejar pasar el agua lentamente?","La textura indica la proporción de arena, limo y arcilla de la fracción mineral del suelo. La porosidad indica qué porcentaje del suelo está ocupado por huecos que pueden contener aire o agua. La permeabilidad es la facilidad con la que el agua circula por el suelo. Sí: en un suelo muy arcilloso los poros son pequeños y pueden contener mucha agua, aunque esta circule despacio.",true],
     ["¿Qué factores favorecen que un suelo sea más fértil?","Un suelo es más fértil cuando favorece el crecimiento de las plantas. Ayudan la presencia de humus y de nutrientes disponibles, como nitratos y fosfatos, así como una buena disponibilidad de agua y una aireación adecuada.",true],
     ["Un perfil tiene una costra de cal cerca de la superficie. El otro presenta una capa de suelo muy delgada sobre roca madre poco alterada. ¿Cuál es el caliche y cuál es el suelo rocoso? Justifica tu respuesta.","El primer perfil es un caliche. La pista es la costra de cal. En un clima árido, el agua asciende por capilaridad y, al evaporarse, deja cal o sales cerca de la superficie. El segundo perfil es un litosuelo o suelo rocoso. Las pistas son el poco espesor del suelo, la roca madre poco alterada y los horizontes poco diferenciados.",true]
   ],
   sedimentos: [
-    ["En una ladera se han acumulado fragmentos de roca producidos por la meteorización. Tras una lluvia intensa, el agua arrastra parte de ellos pendiente abajo y los deja al llegar a una zona llana donde pierde velocidad. Identifica el detrito, explica cuándo esos fragmentos pasan a llamarse sedimento y distingue erosión, transporte y sedimentación.","El detrito es el conjunto de fragmentos sueltos que se habían acumulado en la ladera donde se formaron. La erosión comienza cuando el agua de escorrentía recoge parte de ese detrito y pone los clastos en movimiento. Desde que el agua los moviliza, esos fragmentos se llaman sedimento, también mientras viajan. El transporte es su desplazamiento ladera abajo. Cuando la corriente se ralentiza al llegar a la zona llana y deja de arrastrarlos, se produce la sedimentación. El sedimento queda allí depositado."],
+    ["¿Qué es la meteorización? Explica en qué se diferencia de la erosión.","La meteorización altera los minerales o fragmenta la roca en superficie, en el mismo lugar donde se encuentra. Por ejemplo, cuando el agua se congela en una grieta y la ensancha, la roca se meteoriza. Si una corriente recoge después los clastos y los pone en movimiento, se produce erosión. Los fragmentos que permanecen acumulados donde se formaron constituyen el detrito."],
+    ["En una ladera se han acumulado fragmentos de roca producidos por la meteorización. Tras una lluvia intensa, el agua arrastra parte de ellos pendiente abajo y los deja al llegar a una zona llana donde pierde velocidad. Identifica el detrito, explica cuándo esos fragmentos pasan a llamarse sedimento y distingue erosión, transporte y sedimentación.",[
+      "<strong>Detrito.</strong> Los fragmentos de roca están acumulados en la ladera, donde se formaron.",
+      "<strong>Erosión.</strong> Comienza cuando el agua recoge parte del detrito y lo pone en movimiento. Desde ese momento, los fragmentos se llaman <strong>sedimento</strong>.",
+      "<strong>Transporte.</strong> El agua arrastra el sedimento ladera abajo.",
+      "<strong>Sedimentación.</strong> Al llegar a la zona llana, el agua pierde velocidad y deja allí el sedimento."
+    ]],
     ["¿Cuáles son los modos de transporte de sedimentos? Distingue los que tienen contacto con el fondo de los que se producen separados de él.","En contacto con el fondo: reptación, rodadura y saltación. En la reptación las partículas se arrastran. En la rodadura ruedan y en la saltación avanzan en saltos. Separados del fondo: suspensión, flotación y disolución. En suspensión las partículas viajan en el fluido, en flotación van por su superficie y en disolución las sustancias viajan disueltas en el agua.",true],
     ["Una partícula avanza dando saltos y otra viaja dentro del agua sin tocar el fondo. ¿Cómo se transporta cada una?","La primera viaja por saltación. La corriente la levanta y la partícula vuelve a tocar el fondo antes del salto siguiente. La segunda viaja en suspensión. Permanece dentro del agua durante el desplazamiento, sin apoyarse en el fondo."],
-    ["¿Cuándo tiene un sedimento madurez textural alta? Observa las muestras A y B del recuadro. ¿Cuál presenta mayor madurez textural? Justifica tu respuesta por el tamaño y la forma de los clastos.","Un sedimento tiene madurez textural alta cuando está formado por clastos muy pequeños y redondeados. La muestra A, arena de playa, presenta esos dos rasgos y tiene mayor madurez textural. La muestra B, sedimento glaciar, tiene menor madurez textural porque sus fragmentos son angulosos y de distintos tamaños.",true],
+    ["¿Cuándo tiene un sedimento madurez textural alta? Observa las muestras A y B del recuadro. ¿Cuál presenta mayor madurez textural? Justifica tu respuesta por el tamaño y la forma de los clastos.",`${relacionTransporteTextural} Un sedimento tiene madurez textural alta cuando está formado por clastos muy pequeños y redondeados. La muestra A, arena de playa, presenta esos dos rasgos y tiene mayor madurez textural. La muestra B, sedimento glaciar, tiene menor madurez textural porque sus fragmentos son angulosos y de distintos tamaños.`,true],
     ["Durante la sedimentación, ¿en qué se diferencian el depósito gravitacional y la acreción cinética?","En el depósito gravitacional, la corriente pierde energía y los clastos que transportaba caen al fondo por gravedad. En la acreción cinética, los clastos todavía están en movimiento cuando encuentran un obstáculo que provoca su acumulación. La pista es si los clastos caen al fondo al debilitarse la corriente o se acumulan al topar con un obstáculo.",true]
   ],
   magma: [
     ["¿En qué se diferencian el magmatismo, el metamorfismo y los esfuerzos tectónicos?","En el magmatismo, la fusión de las rocas produce un líquido, el magma, que contiene cristales en suspensión y gases disueltos. En el metamorfismo, la roca se transforma por cambios de presión y temperatura, pero permanece en estado sólido. Los esfuerzos tectónicos pueden curvar o fracturar las rocas y desplazar los bloques.",true],
-    ["Mira el bloque diagrama de la página 288. ¿Qué proceso explica la formación de magma en la zona de subducción? ¿Y la transformación en estado sólido de los sedimentos comprimidos? ¿Qué esfuerzo reconoces en la falla transformante?","Es magmatismo en la zona de subducción. La placa que se hunde aporta agua y facilita la formación de magma. Es metamorfismo en los sedimentos comprimidos del prisma de acreción, porque se transforman en estado sólido. En la falla transformante actúa la cizalla, porque los bloques se desplazan lateralmente entre sí.",true],
-    ["En la página 288, ¿actúan esfuerzos compresivos o distensivos sobre la placa continental? ¿Qué los causa?","Actúan esfuerzos compresivos. Las placas convergen y la placa que se hunde empuja y comprime el borde del continente."],
+    ["Mira el bloque diagrama. ¿Qué proceso explica la formación de magma en la zona de subducción? ¿Y la transformación en estado sólido de los sedimentos comprimidos? ¿Qué esfuerzo reconoces en la falla transformante?","Es magmatismo en la zona de subducción. La placa que se hunde aporta agua y facilita la formación de magma. Es metamorfismo en los sedimentos comprimidos del prisma de acreción, porque se transforman en estado sólido. En la falla transformante actúa la cizalla, porque los bloques se desplazan lateralmente entre sí.",true],
+    ["En el bloque diagrama, ¿actúan esfuerzos compresivos o distensivos sobre la placa continental? ¿Qué los causa?","Actúan esfuerzos compresivos. Las placas convergen y la placa que se hunde empuja y comprime el borde del continente."],
     ["En el prisma de acreción del dibujo, ¿qué predomina, la presión o la temperatura? ¿Qué pista lo indica?","Predomina la presión. El dibujo muestra que el empuje de la placa comprime los sedimentos acumulados. Por eso se trata de metamorfismo regional de alta presión."],
     ["La fusión de las rocas produce un líquido con cristales en suspensión y gases disueltos. ¿Cómo se llama? Identifica sus tres fracciones.","Se llama magma. La roca fundida es la fracción líquida. Los cristales en suspensión forman parte de la fracción sólida, que también puede contener fragmentos de roca. Los gases disueltos constituyen la fracción gaseosa."],
     ["¿Qué son un plutón y un dique? Indica cómo se distinguen por su forma.","Un plutón es una masa voluminosa de roca magmática que se solidifica en profundidad. Suele tener forma ovoide o de cúpula. Un dique es una lámina delgada que se forma cuando el magma solidifica en una fractura. Se reconoce porque atraviesa las capas que ya existían.",true],
-    ["En el corte de la página 289 hay una masa gris abovedada a la izquierda y una lámina gris que atraviesa varias capas. ¿Cuál es el plutón y cuál es el dique? Justifica con una pista en cada caso.","La masa gris abovedada de la izquierda es el plutón. La pista es su forma de cúpula. La lámina gris inclinada es el dique. La pista es que corta las capas de roca.",true],
+    ["En el corte hay una masa gris abovedada a la izquierda y una lámina gris que atraviesa varias capas. ¿Cuál es el plutón y cuál es el dique? Justifica con una pista en cada caso.","La masa gris abovedada de la izquierda es el plutón. La pista es su forma de cúpula. La lámina gris inclinada es el dique. La pista es que corta las capas de roca.",true],
     ["En un dibujo de un volcán, localiza la cámara, la chimenea, el cráter y el cono. ¿En qué se diferencia una caldera de un cráter?","La cámara magmática es la zona donde se acumula el magma en profundidad. La chimenea es el conducto por el que asciende y el cráter es la abertura de salida. El cono es el relieve formado por la acumulación de materiales de las erupciones. La caldera es una depresión amplia y suele formarse por el hundimiento del techo de la cámara magmática.",true],
     ["Explica qué sucede con los gases al ascender el magma. ¿Qué productos puede emitir una erupción?","Al ascender el magma, baja la presión y los gases disueltos forman burbujas. El magma se vuelve espumoso y menos denso. Su empuje favorece la apertura de fracturas que le permiten llegar a la superficie. En la erupción pueden salir gases, lava y piroclastos.",true],
     ["¿Qué cuatro factores influyen en la actividad volcánica? Explica qué cambia en cada caso.","Composición: más sílice significa mayor viscosidad. Temperatura: cuanto más caliente, más fluido. Cantidad de gases disueltos: mientras están disueltos, favorecen la fluidez. Al bajar la presión, se forman burbujas y los gases tienden a escapar. Lugar: bajo el agua, el enfriamiento es brusco y puede dar lugar a lavas almohadilladas. En tierra pueden formarse coladas.",true],
@@ -275,14 +286,18 @@ const figurePlacement = {
 };
 
 const questionPlacement = {
-  meteorizacion:[0,0], suelo:[0,0,0,1,2,3,4], sedimentos:[0,2,2,3,4],
+  meteorizacion:[0], suelo:[0,0,0,1,2,3,4], sedimentos:[0,0,2,2,3,4],
   magma:[0,0,0,0,1,2,2,3,4,6,6], igneas:[0,3,0,2,4,5,4,5,5],
   meta:[0,3,4,5,5,5], ciclo:[1,3,3], esfuerzos:[1,2,3]
 };
 const extraQuestions = {
   sedimentos: {
-    0:["¿Qué es la erosión? ¿En qué se diferencian el detrito y la sedimentación?","La erosión es el arranque o la recogida de materiales por un agente geológico, como el agua, que los pone en movimiento. El detrito es el conjunto de fragmentos sueltos que la meteorización ha producido y que siguen acumulados donde se formaron. La sedimentación es el proceso por el que se depositan los materiales que ya estaban siendo transportados. El detrito es un material. La sedimentación es un proceso.",true],
-    3:["¿Qué indica una madurez mineralógica alta? Explica por qué un sedimento puede ser rico en cuarzo o en minerales de arcilla después de una alteración prolongada.","Al alterarse los minerales menos resistentes, disminuye su proporción en el sedimento. El cuarzo resiste mejor y, por eso, aumenta su proporción respecto a los demás minerales. Las micas y los feldespatos pueden alterarse químicamente y formar minerales de arcilla. En ambos casos, la composición ayuda a reconocer una madurez mineralógica alta. Para valorar la madurez textural se observan el tamaño y la forma de los clastos."]
+    0:["¿Qué es la erosión? ¿En qué se diferencia del detrito y de la sedimentación?",[
+      "<strong>Erosión.</strong> Comienza cuando un agente como el agua recoge parte del detrito y lo pone en movimiento.",
+      "<strong>Detrito.</strong> Son los fragmentos de roca que siguen acumulados en el lugar donde se formaron.",
+      "<strong>Sedimentación.</strong> Ocurre cuando el agua deja los fragmentos que estaba transportando."
+    ],true],
+    3:["¿Qué indica una madurez mineralógica alta? Explica por qué un sedimento puede ser rico en cuarzo o en minerales de arcilla después de una alteración prolongada.",madurezMineralogica]
   },
   suelo: {
     0:["En la misma zona hay una ladera muy inclinada y una superficie llana con vegetación. ¿Dónde es más probable que se forme suelo? Explica por qué.","En la superficie llana. El detrito se mantiene más estable y puede acumularse. Los seres vivos mezclan los materiales, favorecen que se retenga agua y aportan restos orgánicos que, al descomponerse, forman humus."]
@@ -318,7 +333,7 @@ const preguntasRocasSedimentarias = [
   ["Te dan las características · identifica la roca",[
     ["Compara dos rocas detríticas. Una tiene cantos redondeados de 8 mm unidos por un cemento. La otra está formada por granos cementados de 0,5 mm. Identifícalas y justifica la clasificación.","La primera es una pudinga. Los cantos superan los 2 mm y están unidos por un cemento, así que es un conglomerado. Los cantos redondeados permiten distinguirla de una brecha. La segunda es una arenisca porque los 0,5 mm están dentro del intervalo del tamaño arena, entre 1/16 mm y 2 mm.",true],
     ["Una muestra es parda y conserva restos vegetales. Otra es gris y tiene brillo metálico. ¿Qué dos carbones son?","La primera muestra es turba. Se reconoce por el color pardo y los restos vegetales. La segunda es antracita. Se reconoce por el color gris y el brillo metálico."],
-    ["¿Qué roca mixta está formada por carbonato de calcio y una parte importante de limo o arcilla?","Es una marga. En la página 275 aparece en el apartado 4.3, Rocas mixtas."]
+    ["¿Qué roca mixta está formada por carbonato de calcio y una parte importante de limo o arcilla?","Es una marga."]
   ]],
   ["Minerales · repaso breve",[
     ["Relaciona los cinco minerales de repaso con una característica.","Cuarzo: es resistente y frecuente en areniscas. Minerales de arcilla: la caolinita es un ejemplo. Yeso: es un sulfato de calcio. Halita: es cloruro de sodio. Calcita: es carbonato de calcio y es el mineral principal de las calizas."]
@@ -327,16 +342,16 @@ const preguntasRocasSedimentarias = [
 
 const preguntasMecanica = [
   ["Te dan el nombre. Explica cómo actúa",[
-    ["¿En qué consiste la termoclastia?","Las diferencias de temperatura provocan dilataciones y contracciones desiguales. Los esfuerzos resultantes pueden fracturar la roca.",true],
-    ["¿En qué consiste la gelifracción?","El agua entra en las grietas. Cuando se congela aumenta de volumen y presiona sus paredes, lo que ensancha la grieta."],
-    ["¿Cómo puede la descompresión fracturar una roca?","Al perder la presión de los materiales que tenía encima, la roca se expande. Esa expansión puede abrir grietas."],
-    ["¿En qué consiste la abrasión?","Las partículas transportadas por el agua, el viento o el hielo rozan la roca y desgastan su superficie."]
+    ["¿En qué consiste la termoclastia?",meteorizacionMecanica.termoclastia,true],
+    ["¿En qué consiste la gelifracción?",meteorizacionMecanica.gelifraccion],
+    ["¿Cómo puede la descompresión fracturar una roca?",meteorizacionMecanica.descompresion],
+    ["¿En qué consiste la abrasión?",meteorizacionMecanica.abrasion]
   ]],
   ["Te dan las características. Identifica el mecanismo",[
-    ["El viento arrastra arena que, al rozar una roca, va desgastando su superficie. ¿Qué mecanismo actúa? Justifica tu respuesta.","Abrasión. La pista es el desgaste por el roce de partículas transportadas."],
-    ["Una roca llega cerca de la superficie. Al disminuir la presión que soporta, se expande y aparecen grietas. ¿Qué mecanismo actúa? Justifica tu respuesta.","Descompresión. La pista es que la pérdida de presión permite que la roca se expanda."],
-    ["Tras repetidos calentamientos y enfriamientos, los minerales de una roca se dilatan y se contraen de manera desigual. ¿Qué mecanismo puede acabar fracturándola? Justifica tu respuesta.","Termoclastia. La pista es la dilatación desigual debida a los cambios de temperatura.",true],
-    ["El agua penetra en una grieta y durante la noche se congela. Con el tiempo, la grieta se ensancha. ¿Qué mecanismo actúa? Justifica tu respuesta.","Gelifracción. La pista es el aumento de volumen del agua al congelarse dentro de la grieta."]
+    ["El viento arrastra arena que, al rozar una roca, va desgastando su superficie. ¿Qué mecanismo actúa? Justifica tu respuesta.",`Abrasión. ${meteorizacionMecanica.abrasion}`],
+    ["Una roca llega cerca de la superficie. Al disminuir la presión que soporta, se expande y aparecen grietas. ¿Qué mecanismo actúa? Justifica tu respuesta.",`Descompresión. ${meteorizacionMecanica.descompresion}`],
+    ["Tras repetidos calentamientos y enfriamientos, los minerales de una roca se dilatan y se contraen de manera desigual. ¿Qué mecanismo puede acabar fracturándola? Justifica tu respuesta.",`Termoclastia. ${meteorizacionMecanica.termoclastia}`,true],
+    ["El agua penetra en una grieta y durante la noche se congela. Con el tiempo, la grieta se ensancha. ¿Qué mecanismo actúa? Justifica tu respuesta.",`Gelifracción. ${meteorizacionMecanica.gelifraccion}`]
   ]]
 ];
 const preguntasQuimica = [
@@ -347,19 +362,19 @@ const preguntasQuimica = [
     ["¿En qué consiste la hidrólisis?",meteorizacionQuimica.hidrolisis]
   ]],
   ["Te dan las características. Identifica el mecanismo",[
-    ["El agua con dióxido de carbono facilita que se disuelva la calcita. ¿Qué mecanismo actúa?","Carbonatación. La pista es la acción del agua con dióxido de carbono sobre la calcita."],
-    ["Los iones hidrógeno e hidroxilo del agua rompen la estructura cristalina de un mineral. ¿Qué mecanismo actúa?","Hidrólisis. La pista es que esos iones alteran químicamente la estructura cristalina del mineral."],
-    ["Un sulfuro reacciona con el oxígeno del aire y aparecen óxidos e hidróxidos. ¿Qué mecanismo actúa?","Oxidación. La pista es la reacción con el oxígeno y la formación de óxidos e hidróxidos."],
-    ["El agua entra en contacto con halita y sus iones pasan al agua. ¿Qué mecanismo actúa?","Disolución. La pista es que un mineral soluble se separa en iones en el agua."]
+    ["El agua con dióxido de carbono facilita que se disuelva la calcita. ¿Qué mecanismo actúa?",`Carbonatación. ${meteorizacionQuimica.carbonatacion}`],
+    ["Los iones hidrógeno e hidroxilo del agua rompen la estructura cristalina de un mineral. ¿Qué mecanismo actúa?",`Hidrólisis. ${meteorizacionQuimica.hidrolisis}`],
+    ["Un sulfuro reacciona con el oxígeno del aire y aparecen óxidos e hidróxidos. ¿Qué mecanismo actúa?",`Oxidación. ${meteorizacionQuimica.oxidacion}`],
+    ["El agua entra en contacto con halita y sus iones pasan al agua. ¿Qué mecanismo actúa?",`Disolución. ${meteorizacionQuimica.disolucion}`]
   ]]
 ];
 const preguntasBiologica = [
   ["Te dan el nombre. Explica qué ocurre",[
-    ["¿En qué consiste la meteorización biológica? Pon un ejemplo mecánico y otro químico.","Los seres vivos pueden fragmentar las rocas o alterar sus minerales. Las raíces actúan como cuñas en las grietas, de forma parecida a la gelifracción. Como ejemplo químico, el oxígeno que aporta la fotosíntesis al agua y al aire favorece la oxidación de minerales."],
+    ["¿En qué consiste la meteorización biológica? Pon un ejemplo mecánico y otro químico.",`Los seres vivos pueden fragmentar las rocas o alterar sus minerales. ${raicesMeteorizacion} Como ejemplo químico, el oxígeno que aporta la fotosíntesis al agua y al aire favorece la oxidación de minerales.`],
     ["¿Cómo favorece la meteorización la cubierta herbácea?","La cubierta herbácea conserva la humedad del suelo. Esto facilita la oxidación, la carbonatación y la disolución de minerales."]
   ]],
   ["Te dan las características. Identifica el proceso",[
-    ["Una raíz crece dentro de una grieta y la ensancha. ¿Qué tipo de meteorización es? ¿Cómo actúa la raíz?","Es meteorización biológica por acción mecánica. La raíz actúa como una cuña, de forma parecida al hielo en la gelifracción."],
+    ["Una raíz crece dentro de una grieta y la ensancha. ¿Qué tipo de meteorización es? ¿Cómo actúa la raíz?",`Es meteorización biológica por acción mecánica. ${raicesMeteorizacion}`],
     ["La respiración de los seres vivos y algunos procesos de descomposición aportan dióxido de carbono al agua. ¿Qué efecto tiene?","La respiración y la descomposición realizada por bacterias y hongos aportan dióxido de carbono al agua. Esto aumenta su acidez y favorece la carbonatación, que facilita, por ejemplo, la disolución de la calcita."],
     ["En una laguna con algas, la fotosíntesis aporta oxígeno al agua. ¿Qué proceso de meteorización puede favorecer?","La oxidación. Al haber más oxígeno, el agua tiene mayor capacidad de oxidar minerales."]
   ]]
@@ -367,7 +382,7 @@ const preguntasBiologica = [
 const gruposMeteorizacion = [null,preguntasMecanica,preguntasQuimica,preguntasBiologica];
 const examStar = '<span aria-hidden="true">★ </span>';
 
-const belenStar = '<span class="belen-star" role="img" aria-label="Pregunta o formato mencionado por Belén" title="Pregunta o formato mencionado por Belén">★</span>';
+const belenStar = '<span class="belen-star" role="img" aria-label="Pregunta destacada" title="Pregunta destacada">★</span>';
 
 function promptCards(entries) {
   return entries.map(([question,answer,destacada])=>`<div class="exam-question"><p>${destacada?belenStar+" ":""}<strong>${question}</strong></p><details><summary aria-label="Ver respuesta modelo: ${question}">Ver respuesta modelo</summary>${modelExplanation(answer)}</details></div>`).join("");
@@ -394,9 +409,9 @@ function studyPrompts(id,index) {
   if (!entries.length) return "";
   const confirmed = id==="meta" && index===3;
   let title = entries.length===1 ? "Pregunta de práctica" : "Preguntas de práctica";
-  if (confirmed) title = "Serie regional · pregunta segura según Belén";
+  if (confirmed) title = "Serie regional · pregunta segura";
   if (id==="suelo" && index===1) title = "Horizontes del suelo · posible pregunta con dibujo";
-  if (id==="suelo" && index===4) title = "Caliche y suelo rocoso · comparación destacada por Belén";
+  if (id==="suelo" && index===4) title = "Caliche y suelo rocoso";
   if (id==="esfuerzos" && (index===2 || index===3)) title = "Formato anunciado · identificar los elementos en un dibujo";
   return `<div class="study-prompts inline-prompts"><h3>${confirmed?examStar:""}${title}</h3>
   ${promptCards(entries)}
@@ -446,7 +461,7 @@ function figures(lesson,index) {
   if (!related.length) return "";
   const galleryClass = lesson.id==="sedimentarias" && index===4 ? " mineral-photos" : "";
   return `<div class="book-figures${galleryClass}">${related.map(([file,title,alt,page,version=lesson.id==="meteorizacion"?15:14])=>`<figure class="book-figure"><a href="./${file}.webp?v=${version}" aria-label="Ampliar en otra pestaña: ${title}" target="_blank" rel="noopener">
-    <img src="./${file}.webp?v=${version}" alt="${alt}" loading="lazy"></a><figcaption><strong>${title}.</strong> Libro, p. ${page}.${figureGuide(file)}</figcaption></figure>`).join("")}</div>`;
+    <img src="./${file}.webp?v=${version}" alt="${alt}" loading="lazy"></a><figcaption><strong>${title}.</strong>${figureGuide(file)}</figcaption></figure>`).join("")}</div>`;
 }
 
 function lessonBody(lesson,readButtons=false) {
@@ -455,10 +470,9 @@ function lessonBody(lesson,readButtons=false) {
     ? `<ul>${lesson.esquema.map(item => `<li>${item}</li>`).join("")}</ul>`
     : flow(lesson.esquema);
   const listen = title => readButtons ? speaker("Escuchar: "+title,"data-read") : "";
-  return `<p class="muted">Libro · pp. ${lesson.paginas}</p>
-  ${readButtons?`<p class="study-note">${`${belenStar} Pregunta o formato que mencionó Belén.`}</p>`:""}
+  return `
   ${readButtons && lesson.id==="igneas"?'<p><a class="button primary" href="https://orientadoracarmenmora-max.github.io/rocas_magmaticas/" target="_blank" rel="noopener">Estudiar los tipos de rocas magmáticas (abre otra pestaña)</a></p>':""}
-  <section class="notice"><div class="block-head"><h2>Idea principal</h2>${listen("Idea principal")}</div><div class="explanation">${explanation(lesson.idea)}</div></section>
+  ${lesson.id === "meteorizacion" ? "" : `<section class="notice"><div class="block-head"><h2>Idea principal</h2>${listen("Idea principal")}</div><div class="explanation">${explanation(lesson.idea)}</div></section>`}
   ${lesson.bloques.map(([title,body,subtopics=[]],index) => {
   const pictures = readButtons ? figures(lesson,index) : "";
   const showPicturesFirst = (lesson.id==="magma" && index<=3) || (lesson.id==="igneas" && index===0) || (lesson.id==="esfuerzos" && index>=2);
@@ -466,8 +480,8 @@ function lessonBody(lesson,readButtons=false) {
   <div class="block-head"><h2>${title}</h2>${listen(title)}</div>
   ${showPicturesFirst ? pictures : ""}
   <div class="explanation">${explanation(body)}</div>
-  ${subtopics.map(([key,heading,content])=>`<section><div class="block-head"><h3>${heading}</h3>${listen(heading)}</div>
-  <div class="explanation">${explanation(content)}</div>${readButtons ? figures(lesson,key) : ""}</section>`).join("")}
+  ${subtopics.map(([key,heading,content,intro])=>`<section><div class="block-head"><h3>${lesson.id === "suelo" && index === 0 ? `<mark class="soil-factor">${heading}</mark>` : heading}</h3>${listen(heading)}</div>
+  <div class="explanation">${Array.isArray(content) ? `${intro ? `<p>${intro}</p>` : ""}${studyPoints(content)}` : explanation(content)}</div>${readButtons ? figures(lesson,key) : ""}</section>`).join("")}
   ${showPicturesFirst ? "" : pictures}
   ${readButtons ? studyPrompts(lesson.id,index) : ""}</section>`;
   }).join("")}
@@ -675,8 +689,8 @@ function renderChallengeList(id,guided) {
       if (item.marcas) return `<figure class="book-figure photo-exercise"><div class="numbered-photo">
         <img src="./${file}.webp" alt="${alt}" loading="lazy">
         ${item.marcas.map(([n,x,y])=>`<span aria-hidden="true" style="--x:${x};--y:${y}">${n}</span>`).join("")}</div>
-        <figcaption>Fotografía del libro, p. ${page}.</figcaption></figure>`;
-      return `<figure class="book-figure"><a href="./${file}.webp" aria-label="Ampliar imagen del libro" target="_blank" rel="noopener"><img src="./${file}.webp" alt="${alt}" loading="lazy"></a><figcaption>Actividad final del libro, p. ${page}.</figcaption></figure>`;
+        <figcaption>Fotografía del libro.</figcaption></figure>`;
+      return `<figure class="book-figure"><a href="./${file}.webp" aria-label="Ampliar imagen del libro" target="_blank" rel="noopener"><img src="./${file}.webp" alt="${alt}" loading="lazy"></a><figcaption>Actividad final del libro.</figcaption></figure>`;
     }
     const profile = (name,layers) => `<figure><ol class="soil-profile soil-variant" aria-label="${name}">${layers.map(([mark,detail])=>`<li><strong>${mark}</strong><span class="sr-only">${detail}</span></li>`).join("")}</ol><figcaption>${name}</figcaption></figure>`;
     if (item.capas) return profile("Perfil 2 · De arriba abajo",item.capas);
@@ -869,7 +883,7 @@ function renderMock() {
   const numbered = `<figure class="book-figure photo-exercise"><div class="numbered-photo">
     <img src="./14-podsol.webp" alt="${photo.imagen[1]}">
     ${photo.marcas.map(([number,x,y])=>`<span aria-hidden="true" style="--x:${x};--y:${y}">${number}</span>`).join("")}</div>
-    <figcaption>Perfil del suelo. Libro, p. 271.</figcaption></figure>`;
+    <figcaption>Perfil del suelo.</figcaption></figure>`;
   screen.innerHTML += `<p>${preguntasSimulacro.length} preguntas de los temas 14 y 15. Responde con los términos del libro. La corrección aparece al entregar.</p>
     <form id="mock-form"><ol class="mock-list">${preguntasSimulacro.map(({tema,pregunta,foto,campos,corte},i)=>`<li class="block">
     <section><div class="block-head"><h2>Pregunta ${i+1} · Tema ${tema}</h2>${speaker("Escuchar la pregunta "+(i+1),"data-read")}</div>
@@ -911,11 +925,39 @@ function renderMock() {
   if (mockSubmitted) showResult(false);
 }
 
+const pistasHorizontes = [
+  ["O","Es la capa superficial de hojas y otros restos orgánicos."],
+  ["A","Es la capa de lavado, situada justo debajo del mantillo."],
+  ["B","Está debajo del horizonte A y acumula parte del material arrastrado."],
+  ["C","Es la capa profunda con fragmentos y restos de la roca madre."]
+];
+
+const perfilesConCuatroHorizontes = [
+  {titulo:"Fotografía del libro", foto:"cuatro-horizontes",
+   alt:"B señala la banda superficial junto a la vegetación. D señala la franja oscura inferior. A señala la capa intermedia con algunos fragmentos. C señala el material rocoso del fondo.",
+   marcas:[["B",33,12],["D",35,76],["A",48,76],["C",83,76]],
+   correccion:["B","D","A","C"].map((tag,i)=>[tag,...pistasHorizontes[i]])},
+  ...[
+    ["Perfil bajo vegetación", "DBAC", ["#503727","#956247","#b0774d","#d6bb95"], [12,29,37,22]],
+    ["Perfil con mantillo fino", "CADB", ["#3b2b23","#65493b","#ac6343","#c6a880"], [9,25,24,42]],
+    ["Perfil con capa intermedia gruesa", "ACBD", ["#45372f","#a79478","#aa765a","#c9bcae"], [13,18,51,18]],
+    ["Perfil con capa inferior pedregosa", "BDCA", ["#403026","#765b49","#95654e","#aaa090"], [12,22,22,44]],
+    ["Perfil con mantillo grueso", "DCAB", ["#644938","#97745b","#925231","#bab099"], [19,27,34,20]]
+  ].map(([titulo,tags,colors,depths])=>({
+    titulo,
+    capas:[...tags].map((tag,i)=>[tag,colors[i],depths[i],[
+      "Restos de hojas en la superficie.","Tierra con raíces bajo los restos superficiales.",
+      "Franja intermedia con acumulaciones.","Fragmentos de roca en la parte inferior."
+    ][i]]),
+    correccion:[...tags].map((tag,i)=>[tag,...pistasHorizontes[i]])
+  }))
+];
+
 function trainingProfile(profile) {
   if (profile.foto) return `<figure class="book-figure photo-exercise">
     <div class="numbered-photo"><img src="./14-perfil-${profile.foto}.webp" alt="${profile.alt}">
-    ${profile.marcas.map(([tag,y])=>`<span aria-hidden="true" style="--x:58%;--y:${y}%">${tag}</span>`).join("")}</div>
-    <figcaption>Fotografía de un perfil real · USDA–NRCS</figcaption></figure>`;
+    ${profile.marcas.map(([tag,y,x])=>`<span aria-hidden="true" style="--x:${x}%;--y:${y}%">${tag}</span>`).join("")}</div>
+    <figcaption>Fotografía del libro</figcaption></figure>`;
   const textures = ["roots","dots","gravel"];
   return `<figure class="profile-training-drawing"><div class="profile-training-column" role="img" aria-label="${profile.capas.map(([tag,,,alt])=>tag+". "+alt).join(" ")}">
     ${profile.capas.map(([tag,color,depth],i)=>`<div aria-hidden="true" class="soil-band ${textures[i===profile.capas.length-1 ? 2 : Math.min(i,1)]}" style="--soil:${color};--depth:${depth}"><b>${tag}</b></div>`).join("")}
@@ -926,30 +968,33 @@ function renderSoilTraining() {
   screen.innerHTML += '<div id="soil-training"></div>';
   const area = $("soil-training");
   let current = 0;
-  const order = perfilesEntrenamiento.map((_,index)=>index);
+  const corrected = new Set();
+  const order = perfilesConCuatroHorizontes.map((_,index)=>index);
   const attempts = [];
   function example(focus=false) {
     area.innerHTML = `<section class="block"><h2 tabindex="-1">Ejemplo guiado</h2>
       <p>Observa la flecha de la foto del libro. Señala la franja clara que está encima de la franja ocre.</p>
-      <figure class="book-figure photo-exercise"><img src="./14-podsol.webp" alt="Un perfil de suelo. Una flecha verde señala una franja clara encima de una franja de color ocre."><figcaption>Fotografía del libro, p. 271.</figcaption></figure>
+      <figure class="book-figure photo-exercise"><img src="./14-podsol.webp" alt="Un perfil de suelo. Una flecha verde señala una franja clara encima de una franja de color ocre."><figcaption>Fotografía del libro.</figcaption></figure>
       <p><strong>Respuesta.</strong> En el perfil del libro, la franja señala el <strong>horizonte A</strong>, donde predomina el <strong>lavado</strong>. En el <strong>horizonte B</strong>, situado debajo, se acumula parte del material arrastrado.</p>
       <p>En los perfiles de práctica, fíjate en la posición y en los materiales. Los colores y el grosor de las capas pueden cambiar.</p>
-      <button id="soil-start" class="primary">Ver los perfiles</button></section>`;
+      <button id="soil-start" class="primary">Ver el primer perfil</button></section>`;
     $("soil-start").onclick = question;
     if (focus) area.querySelector("h2").focus();
   }
   function question() {
-    const profile = perfilesEntrenamiento[order[current]];
+    const profile = perfilesConCuatroHorizontes[order[current]];
     const isLastProfile = current + 1 === order.length;
     area.innerHTML = `<section class="block"><h2 tabindex="-1">Perfil ${current+1} de ${order.length}</h2><h3>${profile.titulo}</h3>
-      <p>Observa el perfil y elige un horizonte para cada letra. Puedes pasar al siguiente sin responder.</p>
+      <p>Observa el perfil y elige un horizonte para cada una de las cuatro marcas.</p>
       ${trainingProfile(profile)}
-      <form id="soil-form">${profile.correccion.map(([tag],i)=>`<div class="match-row"><label for="soil-response-${i}">Marca ${tag}</label><select id="soil-response-${i}"><option value="">Elige un horizonte</option>${["O","A","B","C"].map(h=>`<option value="${h}">Horizonte ${h}</option>`).join("")}</select></div>`).join("")}
+      <form id="soil-form">${[...profile.correccion].sort(([a],[b])=>a.localeCompare(b)).map(([tag],i)=>`<div class="match-row"><label for="soil-response-${i}">Marca ${tag}</label><select id="soil-response-${i}"><option value="">Elige un horizonte</option>${["O","A","B","C"].map(h=>`<option value="${h}">Horizonte ${h}</option>`).join("")}</select></div>`).join("")}
       <div class="actions">
         <button type="button" id="soil-previous" ${current===0?"disabled":""}>Perfil anterior</button>
-        <button type="submit" class="primary">${isLastProfile?"Ver la corrección":"Siguiente perfil"}</button>
-      </div></form></section>`;
-    const fields = profile.correccion.map((_,i)=>$("soil-response-"+i));
+        <button type="submit" class="primary">Corregir perfil</button>
+        <button type="button" id="soil-next">${isLastProfile?"Repetir perfiles":"Siguiente perfil"}</button>
+      </div></form><div id="soil-result" hidden></div></section>`;
+    const rows = [...profile.correccion].sort(([a],[b])=>a.localeCompare(b));
+    const fields = rows.map((_,i)=>$("soil-response-"+i));
     fields.forEach((field,i)=>{ field.value=attempts[current]?.[i] ?? ""; });
     function saveAnswers() {
       attempts[current]=fields.map(field=>field.value);
@@ -960,35 +1005,40 @@ function renderSoilTraining() {
       current--;
       question();
     };
+    function showCorrection(focus=false) {
+      const result = $("soil-result");
+      result.hidden = false;
+      result.innerHTML = `<h3 tabindex="-1">Corrección del perfil ${current+1}</h3>
+        <ul class="study-points">${rows.map(([tag,expected,why],i)=>{
+          const answer = attempts[current][i];
+          const status = answer ? (answer===expected?"Correcto":"Revisa") : "Sin responder";
+          return `<li><strong>Marca ${tag} · ${status}.</strong> ${answer?`Elegiste el horizonte ${answer}. `:""}Corresponde al <strong>horizonte ${expected}</strong>. ${why}</li>`;
+        }).join("")}</ul>`;
+      if (focus) result.querySelector("h3").focus();
+    }
+    fields.forEach(field => { field.onchange = () => {
+      corrected.delete(current);
+      $("soil-result").hidden = true;
+    }; });
     $("soil-form").onsubmit = event => {
       event.preventDefault();
       saveAnswers();
-      if (isLastProfile) correction();
-      else {
+      corrected.add(current);
+      showCorrection(true);
+    };
+    $("soil-next").onclick = () => {
+      saveAnswers();
+      if (isLastProfile) {
+        current=0;
+        attempts.length=0;
+        corrected.clear();
+        order.push(order.shift());
+      } else {
         current++;
-        question();
       }
+      question();
     };
-    area.querySelector("h2").focus();
-  }
-  function correction() {
-    area.innerHTML = `<section class="notice"><h2 tabindex="-1">Corrección de los cuatro perfiles</h2><p>Compara lo que elegiste con la pista de cada capa.</p></section>
-      ${order.map((id,i)=>{
-        const profile = perfilesEntrenamiento[id];
-        return `<section class="block"><h3>Perfil ${i+1} · ${profile.titulo}</h3>${trainingProfile(profile)}
-        <ul>${profile.correccion.map(([tag,expected,why],j)=>{
-          const answer = attempts[i]?.[j];
-          const status = answer ? (answer===expected?"Correcto":"Revisa") : "Sin responder";
-          return `<li><strong>${tag} · ${status}.</strong> ${answer?`Elegiste el horizonte ${answer}. `:""}Corresponde al <strong>horizonte ${expected}</strong>. ${why}</li>`;
-        }).join("")}</ul>
-        ${profile.nota?`<p>${profile.nota}</p>`:""}${profile.credito?`<p>${profile.credito} <a href="${fuentePerfiles}" target="_blank" rel="noopener">Ver la fuente original</a></p>`:""}</section>`;
-      }).join("")}<button id="soil-repeat">Repetir con otro orden</button>`;
-    $("soil-repeat").onclick = () => {
-      current=0;
-      attempts.length=0;
-      order.push(order.shift());
-      example(true);
-    };
+    if (corrected.has(current)) showCorrection();
     area.querySelector("h2").focus();
   }
   example();
